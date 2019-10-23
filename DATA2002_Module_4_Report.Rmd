@@ -1,0 +1,66 @@
+---
+title: "DATA2002 Module 4 Report"
+author: "Group 9 (,,,470066919)"
+output: 
+  html_document:
+    theme: simplex
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+```{r load_packages, include=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(janitor)
+library("readxl")
+```
+
+***
+
+## 1. Introduction
+
+
+The data set is adapted from th  
+
+### 1.1 Sampling method and potential biases
+
+
+
+### 1.2 Data import, processing and cleaning
+
+
+
+```{r import_data, message=FALSE, warning=FALSE}
+data = read_excel("infusions_data_2002.xlsx", na = c("NA"))
+data = data %>% janitor::clean_names()
+#glimpse(data)
+```
+
+***
+## 2. Analysis
+### 2.1 Tenderness, Treatment and Animals 
+##### 2.4.5 Test for interaction
+
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
+
+```{r }
+
+```
+
+## 3. Conclusion
+
+
+## 4. References
+<ol>
+<li>  </li>
+</ol> 
+
