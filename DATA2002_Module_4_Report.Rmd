@@ -1,6 +1,6 @@
 ---
 title: "DATA2002 Module 4 Report"
-author: "Group 9 (460352996,,,470066919),480145820"
+author: "Group 9 (460352996,480407614,480145820,470066919)"
 output: 
   html_document:
     theme: simplex
@@ -39,8 +39,7 @@ data = data %>% janitor::clean_names()
 
 ***
 ## 2. Analysis
-### 2.1 Tenderness, Treatment and Animals 
-##### 2.4.5 Test for interaction
+### 2.1 Body Fat
 
 **Hypothesis**:
 $$
@@ -56,10 +55,59 @@ $$
 
 ```
 
-## 3. Conclusion
+### 2.2 Weight
 
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
 
-## 4. References
+```{r }
+
+```
+
+### 2.3 Body Density
+
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
+
+```{r }
+
+```
+
+### 2.4 Age
+
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
+
+```{r }
+
+```
+
+## 4. Limitations
+
+## 5. Conclusion
+
+## 6. References
 <ol>
 <li>  </li>
 </ol> 
