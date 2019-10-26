@@ -48,22 +48,27 @@ Percentage of Body Fat = \beta_0 + \beta_1density + \beta_2age + \beta_3weight +
 + \beta_5neck + \beta_6chest + \beta_7abdomen + \beta_8waist + \beta_9hip + \beta_{10}thigh\\ + \beta_{11}knee + \beta_{12}ankle + \beta_{13}bicep + \beta_{14}forearm + \beta_{15}wrist + \epsilon
 $$
 
-##### Linear regression assumptions for the full model
+##### 2.1.2 Linear regression assumptions for the full model
 The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 ```{r }
 pbf_lm = lm(pct_bf ~ ., data)
 summary(pbf_lm)
 autoplot(pbf_lm, which = 1:2) + theme_bw()
 ```
+<ol>
+<li>Linearity: In the scatterplot above, .</li>
+<li>Homoskedasticity: In the scatterplot above, .</li>
+<li>Normality: In the QQ plot above, .</li>
+</ol>
 
-##### 2.4.4 Dropping variables using the AIC starting from the full model
+##### 2.1.3 Dropping variables using the AIC starting from the full model
 ```{r }
 pbf_step = step(pbf_lm, direction = "backward")
 ```
 
 Backwards selection using the AIC dropped all variables except for age, density and abdomen which are kept in the model.
 
-##### Fitted model for the model selected by the step-wise procedure.
+##### 2.1.4 Fitted model for the model selected by the step-wise procedure.
 $$
 Percentage of Body Fat = 442.3755 - 406.493 \times density\\
 + 0.0118 \times age + 0.0576 \times abdomen\\
@@ -81,7 +86,7 @@ summary(pbf_step)
 #options("scipen"=-100, "digits"=4)
 ```
 
-##### Linear regression assumptions for the stepwise model - why do this? same as previous??
+##### 2.1.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
 ```{r }
 autoplot(pbf_step, which = 1:2) + theme_bw()
 ```
@@ -157,7 +162,7 @@ Age = \beta_0 + \beta_1density + \beta_1pctBodyFat + \beta_2weight + \beta_3heig
 \beta_{13}forearm + \beta_{14}wrist + \epsilon
 $$
 
-##### Linear regression assumptions for the full model - what is x and y?
+##### 2.4.2 Linear regression assumptions for the full model - what is x and y?
 The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 ```{r }
 age_lm = lm(age ~ ., data)
@@ -170,14 +175,14 @@ autoplot(age_lm, which = 1:2) + theme_bw()
 <li>Normality: In the QQ plot above, the points are reasonably close to the diagonal line. Approximately 6 of the points at the bottom do not lie on the line, but the departure is not severe enough to cause any concern. Therefore, we are confident that the normal assumption is at least approximately satisfied.</li>
 </ol>
 
-##### 2.4.4 Dropping variables using the AIC starting from the full model
+##### 2.4.3 Dropping variables using the AIC starting from the full model
 ```{r }
 age_step = step(age_lm, direction = "backward")
 ```
 
 Backwards selection using the AIC dropped variables waist, height, density, bicep and hip but decided to keep chest in the model.
 
-##### Fitted model for the model selected by the step-wise procedure.
+##### 2.4.4 Fitted model for the model selected by the step-wise procedure.
 $$
 Age = -74.36348 + 0.3153 \times pctBodyFat -0.4782 \times weight + 0.8185 \times neck\\
 + 0.32544 \times chest + 0.8824 \times abdomen -1.6054 \times thigh + 1.8424 \times knee\\
@@ -196,16 +201,16 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 50% of 
 summary(age_step)
 ```
 
-##### Linear regression assumptions for the stepwise model - why do this? same as previous??
+##### 2.4.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
 ```{r }
 autoplot(age_step, which = 1:2) + theme_bw()
 ```
 
-## 4. Limitations
+## 3. Limitations
 
-## 5. Conclusion
+## 4. Conclusion
 
-## 6. References
+## 5. References
 <ol>
 <li>  </li>
 </ol> 
