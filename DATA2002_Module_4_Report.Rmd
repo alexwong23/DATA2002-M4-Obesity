@@ -40,20 +40,52 @@ glimpse(data)
 ***
 ## 2. Analysis
 ### 2.1 Body Fat
+provide context to the qn!!! why use linear regression on full model...
 
-**Hypothesis**:
+##### 2.1.1 Defining the model with population parameters
 $$
-H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
-H_1:  \text{ Not all means are the same.}\\
+Percentage of Body Fat = \beta_0 + \beta_1density + \beta_2age + \beta_3weight + \beta_4height\\
++ \beta_5neck + \beta_6chest + \beta_7abdomen + \beta_8waist + \beta_9hip + \beta_{10}thigh\\ + \beta_{11}knee + \beta_{12}ankle + \beta_{13}bicep + \beta_{14}forearm + \beta_{15}wrist + \epsilon
 $$
-**Assumptions:**
-<ol>
-<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
-</ol>
 
+##### Linear regression assumptions for the full model
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 ```{r }
-
+pbf_lm = lm(pct_bf ~ ., data)
+summary(pbf_lm)
+autoplot(pbf_lm, which = 1:2) + theme_bw()
 ```
+
+##### 2.4.4 Dropping variables using the AIC starting from the full model
+```{r }
+pbf_step = step(pbf_lm, direction = "backward")
+```
+
+Backwards selection using the AIC dropped all variables except for age, density and abdomen which are kept in the model.
+
+##### Fitted model for the model selected by the step-wise procedure.
+$$
+Percentage of Body Fat = 442.3755 - 406.493 \times density\\
++ 0.0118 \times age + 0.0576 \times abdomen\\
+$$
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 98% of the variability of age is explained by the regression on density, age and abdomen circumference.
+
+<ol>
+<li>On average, holding the other variables constant, a 1 $gm/cm^3$ increase in density leads to a 400 unit decrease in percentage of body fat.</li>
+<li>On average, holding the other variables constant, a one year increase in age leads to a 0.0118 unit increase in percentage of body fat.</li>
+<li>On average, holding the other variables constant, a one year increase in abdomen circumference leads to a 0.0576 unit increase in percentage of body fat.</li>
+</ol>
+```{r }
+#options("scipen"=100, "digits"=4)
+summary(pbf_step)
+#options("scipen"=-100, "digits"=4)
+```
+
+##### Linear regression assumptions for the stepwise model - why do this? same as previous??
+```{r }
+autoplot(pbf_step, which = 1:2) + theme_bw()
+```
+
 
 ### 2.2 Weight
 
@@ -88,37 +120,85 @@ $$
 ```
 
 ### 2.4 Age
-#### Predict ____ from age.
+#### Predicting percentage of body fat from age
+Fit a simple linear regression to the data to assess whether the age has an influence on the percentage of body fat.
+Taking the log of % of body fat improves the fit by altering the scale and making the variable more "normally" distributed.
 
-##### 2.4.1 Visualising the Data
+$$
+X = \beta_0 + \beta_1log(Y) + \epsilon
+$$
+
+```{r }
+p = data %>% ggplot() + aes(x = age, y = pct_bf) + geom_point() + 
+    geom_smooth(method = "lm", se = FALSE) + theme_bw() +
+    scale_y_continuous(labels = scales::number) + 
+    scale_x_continuous(labels = scales::number) +
+    labs(x = "Age", y = "Body Fat Percentage", title = "Proportion of Body Fat Percentage based on Age", fill = "Percentage of Body Fat", caption = "Source: SOCR Data BMI Regression") +
+    scale_y_log10()
+p
+data.lm = lm(log1p(pct_bf) ~ age, data)
+summary(data.lm)
+```
+A one year increase in age would lead to a 1.15% increase in percentage of body fat.
+
+
+
+
+
+
+
+
+provide context to the qn!!! why use linear regression on full model...
+
+##### 2.4.1 Defining the model with population parameters
+$$
+Age = \beta_0 + \beta_1density + \beta_1pctBodyFat + \beta_2weight + \beta_3height + \beta_4neck + \beta_5chest + \\
+\beta_6abdomen + \beta_7waist + \beta_8hip + \beta_9thigh + \beta_{10}knee + \beta_{11}ankle + \beta_{12}bicep + \\
+\beta_{13}forearm + \beta_{14}wrist + \epsilon
+$$
+
+##### Linear regression assumptions for the full model - what is x and y?
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 ```{r }
 age_lm = lm(age ~ ., data)
 summary(age_lm)
 autoplot(age_lm, which = 1:2) + theme_bw()
 ```
+<ol>
+<li>Linearity: In the scatterplot above, there is no obvious pattern between the residual and fitted values. Hence, we have not misspecified the model.</li>
+<li>Homoskedasticity: In the scatterplot above, the residuals do not appear to be fanning out or changing their variability over the range of the fitted values so the constant error variance assumption is met.</li>
+<li>Normality: In the QQ plot above, the points are reasonably close to the diagonal line. Approximately 6 of the points at the bottom do not lie on the line, but the departure is not severe enough to cause any concern. Therefore, we are confident that the normal assumption is at least approximately satisfied.</li>
+</ol>
 
-
-
+##### 2.4.4 Dropping variables using the AIC starting from the full model
 ```{r }
 age_step = step(age_lm, direction = "backward")
 ```
 
+Backwards selection using the AIC dropped variables waist, height, density, bicep and hip but decided to keep chest in the model.
+
+##### Fitted model for the model selected by the step-wise procedure.
+$$
+Age = -74.36348 + 0.3153 \times pctBodyFat -0.4782 \times weight + 0.8185 \times neck\\
++ 0.32544 \times chest + 0.8824 \times abdomen -1.6054 \times thigh + 1.8424 \times knee\\
+- 0.7486 \times ankle -0.6929 \times forearm + 6.2789 \times wrist
+$$
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 50% of the variability of age is explained by the regression on percentage of body fat, weight, neck, chest, abdomen, thigh, knee, ankle, forearm and wrist.
+
+<ol>
+<li>On average, holding the other variables constant, a 1% increase in body fat leads to a 0.31 unit increase in age.</li>
+<li>On average, holding the other variables constant, a 1 year increase in age leads to a 0.31% increase in bodyFat.</li>
+<li></li>
+<li></li>
+<li></li>
+</ol>
 ```{r }
 summary(age_step)
 ```
 
-**Hypothesis**:
-$$
-H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
-H_1:  \text{ Not all means are the same.}\\
-$$
-**Assumptions:**
-<ol>
-<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
-</ol>
-
+##### Linear regression assumptions for the stepwise model - why do this? same as previous??
 ```{r }
-
+autoplot(age_step, which = 1:2) + theme_bw()
 ```
 
 ## 4. Limitations
