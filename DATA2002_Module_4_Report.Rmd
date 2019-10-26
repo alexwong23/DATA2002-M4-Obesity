@@ -128,7 +128,6 @@ $$
 #### Predicting percentage of body fat from age
 Fit a simple linear regression to the data to assess whether the age has an influence on the percentage of body fat.
 Taking the log of % of body fat improves the fit by altering the scale and making the variable more "normally" distributed.
-
 $$
 X = \beta_0 + \beta_1log(Y) + \epsilon
 $$
@@ -141,17 +140,41 @@ p = data %>% ggplot() + aes(x = age, y = pct_bf) + geom_point() +
     labs(x = "Age", y = "Body Fat Percentage", title = "Proportion of Body Fat Percentage based on Age", fill = "Percentage of Body Fat", caption = "Source: SOCR Data BMI Regression") +
     scale_y_log10()
 p
+```
+
+
+```{r }
 data.lm = lm(log1p(pct_bf) ~ age, data)
 summary(data.lm)
 ```
+
 A one year increase in age would lead to a 1.15% increase in percentage of body fat.
 
+```{r }
+predict(data.lm, data = data.frame(x = 50), interval = "prediction", level = 0.95)
+
+p + geom_segment(aes(y = 0, yend = 2.633523, x = 50, xend = 50), 
+    colour = "gray") + geom_segment(aes(y = 2.633523, yend = 2.633523,
+    x = 25, xend = 50), colour = "gray") + scale_x_continuous(limits = c(25, 75), expand = c(0, 0), labels = scales::number) + scale_y_continuous(limits = c(0, 50), expand = c(0, 0), labels = scales::number)
+```
+
+```{r }
+par(mfrow = c(1, 2))
+plot(data.lm, which = 1:2)
+autoplot(data.lm, which = 1:2) + theme_bw()
+tlm = lm(pct_bf ~ log(age), data)
+summary(tlm)
+autoplot(tlm, which = 1:2) + theme_bw()
+```
+```{r }
+#install.packages("tidyr")
+#install.packages("sjPlot")
+ttlm = lm(log1p(pct_bf) ~ log(age), data)
+sjPlot::tab_model(data.lm, tlm, ttlm, digits = 5, show.ci = FALSE)
+```
 
 
-
-
-
-
+##### 2.4 LINEAR REGRESSION WITH AGE
 
 provide context to the qn!!! why use linear regression on full model...
 
