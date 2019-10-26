@@ -14,12 +14,12 @@ library(tidyverse)
 library(knitr)
 library(janitor)
 library("readxl")
+library(ggfortify)
 ```
 
 ***
 
 ## 1. Introduction
-
 
 The data set is adapted from th  
 
@@ -32,9 +32,9 @@ The data set is adapted from th
 
 
 ```{r import_data, message=FALSE, warning=FALSE}
-data = read_excel("infusions_data_2002.xlsx", na = c("NA"))
+data = read_tsv("bodyfat.txt", na = c("NA"))
 data = data %>% janitor::clean_names()
-#glimpse(data)
+glimpse(data)
 ```
 
 ***
@@ -88,6 +88,24 @@ $$
 ```
 
 ### 2.4 Age
+#### Predict ____ from age.
+
+##### 2.4.1 Visualising the Data
+```{r }
+age_lm = lm(age ~ ., data)
+summary(age_lm)
+autoplot(age_lm, which = 1:2) + theme_bw()
+```
+
+
+
+```{r }
+age_step = step(age_lm, direction = "backward")
+```
+
+```{r }
+summary(age_step)
+```
 
 **Hypothesis**:
 $$
