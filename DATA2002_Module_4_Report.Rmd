@@ -15,6 +15,9 @@ library(knitr)
 library(janitor)
 library("readxl")
 library(ggfortify)
+library(GGally)
+library(qtlcharts)
+library(leaps)
 ```
 
 ***
@@ -93,21 +96,67 @@ autoplot(pbf_step, which = 1:2) + theme_bw()
 
 
 ### 2.2 Weight
-
-**Hypothesis**:
+##### 2.2.1 Defining the model with population parameters
+Since the body density is calculated based on weight, height, neck and other variables below in our data set. It is better not include it in our full model.
 $$
-H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
-H_1:  \text{ Not all means are the same.}\\
+Body Weight = \beta_0  + \beta_1age + \beta_2percentageofbodyfat + \beta_3height\\
++ \beta_4neck + \beta_5chest + \beta_6abdomen + \beta_7waist + \beta_8hip + \beta_{9}thigh\\ + \beta_{10}knee + \beta_{11}ankle + \beta_{12}bicep + \beta_{13}forearm + \beta_{14}wrist + \epsilon
 $$
-**Assumptions:**
-<ol>
-<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
-</ol>
+##### 2.2.2 Check Assumptions:
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 
 ```{r }
-
+dataqf1=within(data,rm(density))
+weight_lm = lm(weight ~ ., dataqf1)
+summary(weight_lm)
+autoplot(weight_lm, which = 1:2) + theme_bw()
 ```
-
+In the plot above the residuals are above zero from the beginning, then they go below zero and end up again above zero for the end.
+This means the linearity assumption fails. We underestimate the weight variable at the start and the end and overestimate the weight at medium.
+To address this problem, I transform the weight to sqrt(weight).
+```{r}
+dataqf=dataqf1%>%mutate(weight=weight^(1/2))
+weight_lmqf = lm(weight ~ ., dataqf)
+summary(weight_lmqf)
+autoplot(weight_lmqf, which = 1:2) + theme_bw()
+```
+The linearity looks much better now.
+<li>Homoskedasticity: In the scatterplot above,The spread looks reasonably constant.  .</li>
+<li>Normality: In the QQ plot above, the tail is below the diagonal line and the first value is a significant outlier. However, we have quite a large sample size so we can rely on the central limit theorem to give us approximately valid inferences.</li>
+```{r}
+qtlcharts::iplotCorr(dataqf)
+```
+It seems there is no direct linear relationship between age and weight. I will do further reserch to work out the appropriate model.
+##### 2.2.3 Dropping and adding variables using the AIC starting from the full model
+```{r}
+M0 = lm(weight ~ 1, data = dataqf)
+step.fwd.aic = step(M0, scope = list(lower = M0, upper = weight_lmqf), direction = "forward", trace = FALSE)
+step.back.aic = step(weight_lmqf, direction = "backward", trace = FALSE)
+summary(step.back.aic)
+summary(step.fwd.aic)
+```
+Both forward and backward search using AIC give the same result. 
+##### 2.2.4 Fitted model for the model selected by the step-wise procedure.
+$$
+sqrt(Weight) = -5.547979   + 0.030800    \times hip+ 0.032385 \times neck + 0.076563    \times height\\
++ 0.031738 \times chest + 0.017835    \times thigh +0.019509    \times abdomen   + 0.023096    \times ankle\\
++ 0.018840    \times bicep +0.017246    \times forearm + 0.050826    \times wrist - 0.003182  \times age + 0.018287 
+\times knee
+$$
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 98% of the variability of age is explained by the regression on hip, neck, height, chest, thigh, abdomen, ankle, bicep, firearm, wrist, age and knee circumference.
+<ol>
+<li>On average, holding the other variables constant, a 1 unit increase in hip leads to a 0.031 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in neck leads to a 0.032 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in height leads to a 0.077 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in chest leads to a 0.032 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in thigh leads to a 0.018 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in abdomen leads to a 0.02 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in ankle leads to a 0.023 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in bicep leads to a 0.0188 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in forearm leads to a 0.017 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in wrist leads to a 0.05 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in age leads to a -0.003 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in knee leads to a 0.018 unit increase in sqrt(weight).</li>
 ### 2.3 Body Density
 
 **Hypothesis**:
