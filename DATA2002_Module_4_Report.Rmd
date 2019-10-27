@@ -33,7 +33,6 @@ The data set is adapted from th
 
 
 ```{r import_data, message=FALSE, warning=FALSE}
-data = data %>% janitor::clean_names()
 
 ```
 
