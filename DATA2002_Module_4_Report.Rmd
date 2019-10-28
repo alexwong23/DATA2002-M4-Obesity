@@ -19,6 +19,7 @@ library(GGally)
 library(qtlcharts)
 library(leaps)
 library(sjPlot)
+library(pheatmap)
 ```
 
 ***
@@ -272,6 +273,43 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 98% of 
 <li>On average, holding the other variables constant, a 1 unit increase in knee leads to a 0.018 unit increase in sqrt(weight).</li>
 ### 2.3 Body Density
 
+##### 2.3.1 Defining the model with population parameters
+$$
+Density = \beta_0 + \beta_1density + \beta_2age + \beta_3weight + \beta_4height\\
++ \beta_5neck + \beta_6chest + \beta_7abdomen + \beta_8waist + \beta_9hip + \beta_{10}thigh\\ + \beta_{11}knee + \beta_{12}ankle + \beta_{13}bicep + \beta_{14}forearm + \beta_{15}wrist + \epsilon
+$$
+```{r}
+cor_matrix <- cor(data)
+pheatmap(cor_matrix, display_numbers = T,na.rm=T)
+```
+
+Above matrix has shown the interactice correlation between variables. Notbaly, Pct.BF has a -0.99 relationship with Density, which means Pct.BF could be used to expalin Density. Meanwhile, variables having similar properties are linked together, which could be useful for generating groups.
+
+##### 2.3.2 Check Assumptions:
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
+```{r}
+data1<-data[,-2]
+```
+
+```{r}
+M0 <- lm(density ~ 1, data = data1)  # Null model
+M1 <- lm(density ~ ., data = data1)  # Full model
+autoplot(M1,which=1:2)+theme_bw()
+round(summary(M1)$coef, 3)
+```
+```{r}
+step.fwd.aic <- step(M0, scope = list(lower = M0, upper = M1), direction = "forward", trace = FALSE)
+summary(step.fwd.aic)
+step.back.aic <- step(M1, scope = list(lower = M0, upper = M1), direction = "backward", trace = FALSE)
+summary(step.back.aic)
+```
+```{r}
+exh <- regsubsets(density~., data = data1, nvmax = 15)
+plot(exh,scale="bic")
+```
+It is best to choose age, weight, height, neck and chest for conducting the relationship analysis with body density.
+
+##### 2.3.3 Dropping variables using the AIC starting from the full model
 **Hypothesis**:
 $$
 H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
@@ -282,9 +320,73 @@ $$
 <li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
 </ol>
 
-```{r }
+```{r}
+M2<- lm(formula = density ~ age + weight + height + neck + chest + abdomen , 
+    data = data1)
+summary(M2)
+M3<- lm(formula = density ~ height + neck + chest + abdomen , 
+    data = data1)
+summary(M3)
 
+
+relweights <- function(fit,...){
+  R <- cor(fit$model)
+  nvar <- ncol(R)
+  rxx <- R[2:nvar, 2:nvar]
+  rxy <- R[2:nvar, 1]
+  svd <- eigen(rxx)
+  evec <- svd$vectors
+  ev <- svd$values
+  delta <- diag(sqrt(ev))
+  lambda <- evec %*% delta %*% t(evec)
+  lambdasq <- lambda ^ 2
+  beta <- solve(lambda) %*% rxy
+  rsquare <- colSums(beta ^ 2)
+  rawwgt <- lambdasq %*% beta ^ 2
+  import <- (rawwgt / rsquare) * 100
+  import <- as.data.frame(import)
+  row.names(import) <- names(fit$model[2:nvar])
+  names(import) <- "Weights"
+  import <- import[order(import),1, drop=FALSE]
+  dotchart(import$Weights, labels=row.names(import),
+           xlab="% of R-Square", pch=19,
+           main="Relative Importance of Predictor Variables",
+           sub=paste("Total R-Square=", round(rsquare, digits=3)),
+           ...)
+  return(import)
+}
+relweights(M3, col="blue")
 ```
+
+##### 2.3.4 Fitted model for the model selected by the step-wise procedure.
+$$
+Body Density = 1.0746853 + 0.0011729 \times Height\\
++ 0.0012053 \times Neck + 0.004285 \times Chest\\ - 0.0020607 \times Abdomen\\
+$$
+
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
+<ol>
+<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0012% unit increase in Height</li>
+<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0012% increase in Neck</li>
+<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0043% increase in Chest</li>
+<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0021% decrease in Abdomen</li>
+</ol>
+
+##### 2.3.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
+```{r}
+autoplot(M3,which=1:2)+theme_bw()
+```
+
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
+
 
 ### 2.4 Age
 #### Predicting percentage of body fat from age
