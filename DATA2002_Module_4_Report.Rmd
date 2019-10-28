@@ -19,6 +19,7 @@ library(GGally)
 library(qtlcharts)
 library(leaps)
 library(sjPlot)
+library(pheatmap)
 ```
 
 ***
@@ -31,22 +32,21 @@ The data set is adapted from th
 
 
 
-### 1.2 Data Import, Processing and Cleaning
+### 1.2 Data import, processing and cleaning
+
+
+
 ```{r import_data, message=FALSE, warning=FALSE}
 data = read_tsv("bodyfat.txt", na = c("NA"))
 data = data %>% janitor::clean_names()
-#glimpse(data)
-
-data = data %>%
-  mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
-         overweight = case_when(
-          bmi >= 25 ~ "yes",
-          bmi < 25 ~ "no"))
+glimpse(data)
 ```
 
 ***
 ## 2. Analysis
 ### 2.1 Body Fat
+provide context to the qn!!! why use linear regression on full model...
+
 ##### 2.1.1 Defining the model with population parameters
 $$
 Percentage of Body Fat = \beta_0 + \beta_1density + \beta_2age + \beta_3weight + \beta_4height\\
@@ -96,9 +96,21 @@ summary(pbf_step)
 autoplot(pbf_step, which = 1:2) + theme_bw()
 ```
 
-
-### 2.2 Prediction for Obesity
+## 2. Analysis
+### 2.1 Prediction for Obesity
 Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+
+#### Data import, Processing and Cleaning
+```{r}
+data = read.delim("bodyfat.txt") %>% janitor::clean_names()
+glimpse(data)
+#Introduce BMI Varaible
+data=data %>% mutate(bmi=(data$weight/(data$height^2))*703,)
+#Isolate the dataset only contain Body Measurements
+data_bf = data[-c(1,3:5,17)]
+#Isolate the dataset to only contain Body Measurements and as weight and height were included in the BMI formula, it is also removed
+data_bmi = data[-c(1:5)]
+```
 
 #### Body Fat Percentage
 ##### Data Visualisation
@@ -112,7 +124,7 @@ Based on the interactive correlation matrix, it can be seen the level of correla
 bf_lm = lm(pct_bf~.,data=data_bf)
 summary(bf_lm)
 ```
-Using the individual p-value method, the variables that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
+Using the individual p-value method, the varaibles that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
 
 ```{r}
 bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
@@ -120,7 +132,7 @@ summary(bf_step_back)
 ```
 Based on the backward selection model, the fitted model has become:
 
-$\hat{bodyfat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
 
 Finally, to check assumption, we perform the ggfortify function.
 
@@ -132,7 +144,7 @@ plot(bf_step_back,which=1:2) + theme_bw()
 The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
 
 ##### Final fitted model
-$\hat{bodyfat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
 
 #### BMI
 For this analysis, the formula of BMI is $BMI = \frac{Weight (lbs)*703}{Height(in)^2}$
@@ -144,21 +156,126 @@ qtlcharts::iplotCorr(data_bmi)
 Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
 
 ##### Multiple Regression
+
 ```{r}
 bmi_lm = lm(bmi~.,data=data_bmi)
 summary(bmi_lm)
 ```
 
-Using the individual p-value method, the variables that need to be dropped are hip, ankle, bicep, forearm and wrist. To double check, the AIC criterion will also be considered.
+Using the individual p-value method, the varaibles that need to be dropped are hip, ankle, bicep, forearm and wrist. To double check, the AIC criterion will also be considered.
+
 ```{r}
 bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
 summary(bmi_step_back)
 ```
 
+Based on the backward selection model, the fitted model has become:
+
+$\hat{bmi} = -10.94 +0.161chest + 0.127abdomen + 0.050hip + 0.150 thigh - 0.23knee + 0.115forearm $
+
+Finally, to check assumption, we perform the ggfortify function.
+
+```{r}
+par(mfrow=c(1,2))
+plot(bmi_step_back,which=1:2) + theme_bw()
+```
+
+The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a fan shaped plot which indicates that the assumption of homogeneous variance is violated. We can use a log transformed response and re-fit the linear regression.
+
+```{r}
+ln_bmi_lm = lm(log(bmi)~.,data=data_bmi)
+summary(ln_bmi_lm)
+ln_bmi_step_back = step(ln_bmi_lm, direction = "backward",trace = FALSE)
+summary(ln_bmi_step_back)
+par(mfrow=c(1,2))
+plot(ln_bmi_step_back,which=1:2) + theme_bw()
+```
+
+```{r}
+sjPlot::tab_model(bmi_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
+```
+
+
+##### Final Fitted Model
+
+$log(\hat{bmi}) = 1.83 +0.0058chest + 0.0052abdomen + 0.0064 thigh -0.0065knee +        0.0028bicep + 0.0040 forearm $.
+
+#### Conclusion
+```{r}
+sjPlot::tab_model(bf_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
+```
+
+Through looking at the two models, we can see that using simply body measurements, it is easier to predict changes in bmi rather than percentage body fat. From the models, measurements of abdomen appears to have the greatest influence on both body fat and bmi and hence any increase should be treated with caution.
+
+
+
+### 2.2 Weight
+##### 2.2.1 Defining the model with population parameters
+Since the body density is calculated based on weight, height, neck and other variables below in our data set. It is better not include it in our full model.
+$$
+Body Weight = \beta_0  + \beta_1age + \beta_2percentageofbodyfat + \beta_3height\\
++ \beta_4neck + \beta_5chest + \beta_6abdomen + \beta_7waist + \beta_8hip + \beta_{9}thigh\\ + \beta_{10}knee + \beta_{11}ankle + \beta_{12}bicep + \beta_{13}forearm + \beta_{14}wrist + \epsilon
+$$
+##### 2.2.2 Check Assumptions:
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
+
+```{r }
+dataqf1=within(data,rm(density))
+weight_lm = lm(weight ~ ., dataqf1)
+summary(weight_lm)
+autoplot(weight_lm, which = 1:2) + theme_bw()
+```
+In the plot above the residuals are above zero from the beginning, then they go below zero and end up again above zero for the end.
+This means the linearity assumption fails. We underestimate the weight variable at the start and the end and overestimate the weight at medium.
+To address this problem, I transform the weight to sqrt(weight).
+```{r}
+dataqf=dataqf1%>%mutate(weight=weight^(1/2))
+weight_lmqf = lm(weight ~ ., dataqf)
+summary(weight_lmqf)
+autoplot(weight_lmqf, which = 1:2) + theme_bw()
+```
+The linearity looks much better now.
+<li>Homoskedasticity: In the scatterplot above,The spread looks reasonably constant.  .</li>
+<li>Normality: In the QQ plot above, the tail is below the diagonal line and the first value is a significant outlier. However, we have quite a large sample size so we can rely on the central limit theorem to give us approximately valid inferences.</li>
+```{r}
+qtlcharts::iplotCorr(dataqf)
+```
+It seems there is no direct linear relationship between age and weight. I will do further reserch to work out the appropriate model.
+##### 2.2.3 Dropping and adding variables using the AIC starting from the full model
+```{r}
+M0 = lm(weight ~ 1, data = dataqf)
+step.fwd.aic = step(M0, scope = list(lower = M0, upper = weight_lmqf), direction = "forward", trace = FALSE)
+step.back.aic = step(weight_lmqf, direction = "backward", trace = FALSE)
+summary(step.back.aic)
+summary(step.fwd.aic)
+```
+Both forward and backward search using AIC give the same result. 
+##### 2.2.4 Fitted model for the model selected by the step-wise procedure.
+$$
+sqrt(Weight) = -5.547979   + 0.030800    \times hip+ 0.032385 \times neck + 0.076563    \times height\\
++ 0.031738 \times chest + 0.017835    \times thigh +0.019509    \times abdomen   + 0.023096    \times ankle\\
++ 0.018840    \times bicep +0.017246    \times forearm + 0.050826    \times wrist - 0.003182  \times age + 0.018287 
+\times knee
+$$
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 98% of the variability of age is explained by the regression on hip, neck, height, chest, thigh, abdomen, ankle, bicep, firearm, wrist, age and knee circumference.
+<ol>
+<li>On average, holding the other variables constant, a 1 unit increase in hip leads to a 0.031 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in neck leads to a 0.032 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in height leads to a 0.077 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in chest leads to a 0.032 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in thigh leads to a 0.018 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in abdomen leads to a 0.02 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in ankle leads to a 0.023 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in bicep leads to a 0.0188 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in forearm leads to a 0.017 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in wrist leads to a 0.05 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in age leads to a -0.003 unit increase in sqrt(weight).</li>
+<li>On average, holding the other variables constant, a 1 unit increase in knee leads to a 0.018 unit increase in sqrt(weight).</li>
 ### 2.3 Body Density
+
 ##### 2.3.1 Defining the model with population parameters
 $$
-Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
+Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
 ```{r}
@@ -261,7 +378,6 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% 
 autoplot(M3,which=1:2)+theme_bw()
 ```
 
-<<<<<<< HEAD
 ### 2.4 Age
 #### Predicting percentage of body fat from age
 Fit a simple linear regression to the data to assess whether the age has an influence on the percentage of body fat.
@@ -367,9 +483,6 @@ summary(age_step)
 autoplot(age_step, which = 1:2) + theme_bw()
 ```
 
-=======
-***
->>>>>>> 9f5db749b95c534da56faddbabf64f3f4673ea8a
 ## 3. Limitations
 <ol>
 <li>Gender Bias</li>
