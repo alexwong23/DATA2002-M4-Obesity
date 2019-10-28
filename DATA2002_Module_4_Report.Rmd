@@ -307,6 +307,7 @@ summary(step.back.aic)
 exh <- regsubsets(density~., data = data1, nvmax = 15)
 plot(exh,scale="bic")
 ```
+
 It is best to choose age, weight, height, neck and chest for conducting the relationship analysis with body density.
 
 ##### 2.3.3 Dropping variables using the AIC starting from the full model
@@ -494,7 +495,12 @@ autoplot(age_step, which = 1:2) + theme_bw()
 ```
 
 ## 3. Limitations
-
+<ol>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ol>
 ## 4. Conclusion
 
 ## 5. References
