@@ -41,11 +41,11 @@ data = data %>%
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
 
-colnames(data)
+#colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
-
+colnames(data_density)
 #glimpse(data)
 ```
 
@@ -149,16 +149,22 @@ $$
 Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
+```{r}
+#data1<-data_density[,-2]
+```
+
 
 ```{r}
 cor_matrix <- cor(data_density)
 pheatmap(cor_matrix, display_numbers = T,na.rm=T)
 ```
 
+<<<<<<< HEAD
 Above matrix has shown the interactice correlation between variables. Notbaly, Pct.BF has a -0.99 relationship with Density, which means Pct.BF could be used to explain Density. Meanwhile, variables having similar properties are linked together, which could be useful for generating groups.
 
 ##### 2.3.2 Check Assumptions
 The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
+
 ```{r}
 M0 <- lm(density ~ 1, data = data_density)  # Null model
 M1 <- lm(density ~ ., data = data_density)  # Full model
@@ -176,12 +182,47 @@ exh <- regsubsets(density~., data = data_density, nvmax = 15)
 plot(exh,scale="bic")
 ```
 
-It is best to choose age, weight, height, neck and chest for conducting the relationship analysis with body density.
 
-##### 2.3.3 Dropping variables using the AIC starting from the full model
+##### 2.3.3 Adding variables using the BIC
 ```{r}
+M2<- lm(formula = density ~ neck + chest + abdomen, 
+    data = data_density)
+summary(M2)
+```
+```{r}
+M3<- lm(formula = density ~ neck + chest + abdomen + waist , 
+    data = data_density)
+summary(M3)
+```
 
+Drop waist and add other variables
+```{r}
+M4<- lm(formula = density ~ neck + chest + abdomen + hip , 
+    data = data_density)
+summary(M4)
+```
 
+```{r}
+M5<- lm(formula = density ~ neck + chest + abdomen + hip + thigh , 
+    data = data_density)
+summary(M5)
+```
+
+Drop chest and add other variables
+```{r}
+M6<- lm(formula = density ~ neck + abdomen + hip + thigh + knee , 
+    data = data_density)
+summary(M6)
+```
+
+Drop knee
+```{r}
+M7<- lm(formula = density ~ neck + abdomen + hip + thigh , 
+    data = data_density)
+summary(M7)
+```
+
+```{r}
 relweights <- function(fit,...){
   R <- cor(fit$model)
   nvar <- ncol(R)
@@ -208,26 +249,132 @@ relweights <- function(fit,...){
            ...)
   return(import)
 }
-relweights(M3, col="blue")
+relweights(M7, col="blue")
 ```
+
+Obviously, abdomen contributes the most in the relationship with body density.
 
 ##### 2.3.4 Fitted model for the model selected by the step-wise procedure.
 $$
-Body Density = 1.0746853 + 0.0011729 \times Height\\
-+ 0.0012053 \times Neck + 0.004285 \times Chest\\ - 0.0020607 \times Abdomen\\
+Body Density = 1.1104052 + 0.0019085 \times Neck\\
+- 0.0022064 \times Abdomen\ + 0.0011314 \times Hip\\ - 0.0006094 \times Thigh\\
 $$
-
-Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 70.4% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
 <ol>
-<li>On average, holding the other variables constant, a 1% increase in Height leads to a 0.0012% unit increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Neck leads to a 0.0012% increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Chest leads to a 0.0043% increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.0021% decrease in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Neck leads to a 0.2% unit increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.2% decrease in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Hip leads to a 0.1% increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Thigh leads to a 0.06% decrease in Density</li>
 </ol>
 
 ##### 2.3.5 Linear regression assumptions for the stepwise model
 ```{r}
-autoplot(M3,which=1:2)+theme_bw()
+autoplot(M7,which=1:2)+theme_bw()
+```
+
+### 2.4 Age
+#### Predicting percentage of body fat from age
+Fit a simple linear regression to the data to assess whether the age has an influence on the percentage of body fat.
+Taking the log of % of body fat improves the fit by altering the scale and making the variable more "normally" distributed.
+$$
+X = \beta_0 + \beta_1log(Y) + \epsilon
+$$
+
+```{r }
+p = data %>% ggplot() + aes(x = age, y = pct_bf) + geom_point() + 
+    geom_smooth(method = "lm", se = FALSE) + theme_bw() +
+    scale_y_continuous(labels = scales::number) + 
+    scale_x_continuous(labels = scales::number) +
+    labs(x = "Age", y = "Body Fat Percentage", title = "Proportion of Body Fat Percentage based on Age", fill = "Percentage of Body Fat", caption = "Source: SOCR Data BMI Regression") +
+    scale_y_log10()
+p
+```
+
+
+```{r }
+data.lm = lm(log1p(pct_bf) ~ age, data)
+summary(data.lm)
+```
+
+A one year increase in age would lead to a 1.15% increase in percentage of body fat.
+
+```{r }
+predict(data.lm, data = data.frame(x = 50), interval = "prediction", level = 0.95)
+
+p + geom_segment(aes(y = 0, yend = 2.633523, x = 50, xend = 50), 
+    colour = "gray") + geom_segment(aes(y = 2.633523, yend = 2.633523,
+    x = 25, xend = 50), colour = "gray") + scale_x_continuous(limits = c(25, 75), expand = c(0, 0), labels = scales::number) + scale_y_continuous(limits = c(0, 50), expand = c(0, 0), labels = scales::number)
+```
+
+```{r }
+par(mfrow = c(1, 2))
+plot(data.lm, which = 1:2)
+autoplot(data.lm, which = 1:2) + theme_bw()
+tlm = lm(pct_bf ~ log(age), data)
+summary(tlm)
+autoplot(tlm, which = 1:2) + theme_bw()
+```
+```{r }
+#install.packages("tidyr")
+#install.packages("sjPlot")
+ttlm = lm(log1p(pct_bf) ~ log(age), data)
+sjPlot::tab_model(data.lm, tlm, ttlm, digits = 5, show.ci = FALSE)
+```
+
+
+##### 2.4 LINEAR REGRESSION WITH AGE
+
+provide context to the qn!!! why use linear regression on full model...
+
+##### 2.4.1 Defining the model with population parameters
+$$
+Age = \beta_0 + \beta_1density + \beta_1pctBodyFat + \beta_2weight + \beta_3height + \beta_4neck + \beta_5chest + \\
+\beta_6abdomen + \beta_7waist + \beta_8hip + \beta_9thigh + \beta_{10}knee + \beta_{11}ankle + \beta_{12}bicep + \\
+\beta_{13}forearm + \beta_{14}wrist + \epsilon
+$$
+
+##### 2.4.2 Linear regression assumptions for the full model - what is x and y?
+The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
+```{r }
+age_lm = lm(age ~ ., data)
+summary(age_lm)
+autoplot(age_lm, which = 1:2) + theme_bw()
+```
+<ol>
+<li>Linearity: In the scatterplot above, there is no obvious pattern between the residual and fitted values. Hence, we have not misspecified the model.</li>
+<li>Homoskedasticity: In the scatterplot above, the residuals do not appear to be fanning out or changing their variability over the range of the fitted values so the constant error variance assumption is met.</li>
+<li>Normality: In the QQ plot above, the points are reasonably close to the diagonal line. Approximately 6 of the points at the bottom do not lie on the line, but the departure is not severe enough to cause any concern. Therefore, we are confident that the normal assumption is at least approximately satisfied.</li>
+</ol>
+
+##### 2.4.3 Dropping variables using the AIC starting from the full model
+```{r }
+age_step = step(age_lm, direction = "backward")
+```
+
+Backwards selection using the AIC dropped variables waist, height, density, bicep and hip but decided to keep chest in the model.
+
+##### 2.4.4 Fitted model for the model selected by the step-wise procedure.
+$$
+Age = -74.36348 + 0.3153 \times pctBodyFat -0.4782 \times weight + 0.8185 \times neck\\
++ 0.32544 \times chest + 0.8824 \times abdomen -1.6054 \times thigh + 1.8424 \times knee\\
+- 0.7486 \times ankle -0.6929 \times forearm + 6.2789 \times wrist
+$$
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 50% of the variability of age is explained by the regression on percentage of body fat, weight, neck, chest, abdomen, thigh, knee, ankle, forearm and wrist.
+
+<ol>
+<li>On average, holding the other variables constant, a 1% increase in body fat leads to a 0.31 unit increase in age.</li>
+<li>On average, holding the other variables constant, a 1 year increase in age leads to a 0.31% increase in bodyFat.</li>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+```{r }
+summary(age_step)
+```
+
+##### 2.4.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
+```{r }
+autoplot(age_step, which = 1:2) + theme_bw()
 ```
 
 #### 2.4 Conclusion
