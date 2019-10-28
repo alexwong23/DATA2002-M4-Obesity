@@ -44,11 +44,11 @@ data = data %>%
           bmi >= 25 ~ "yes",
           bmi < 25 ~ "no"))
 
-colnames(data)
+#colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
-
+colnames(data_density)
 #glimpse(data)
 ```
 
@@ -290,7 +290,6 @@ Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Hei
 $$
 ```{r}
 #data1<-data_density[,-2]
-
 ```
 
 
@@ -319,17 +318,47 @@ exh <- regsubsets(density~., data = data_density, nvmax = 15)
 plot(exh,scale="bic")
 ```
 
-It is best to choose weight, height, neck, chest and abdomen for conducting the relationship analysis with body density.
 
-##### 2.3.3 Dropping variables using the AIC starting from the full model
+##### 2.3.3 Adding variables using the BIC
 ```{r}
-M2<- lm(formula = density ~ age + weight + height + neck + chest + abdomen , 
+M2<- lm(formula = density ~ neck + chest + abdomen, 
     data = data_density)
 summary(M2)
-M3<- lm(formula = density ~ height + neck + chest + abdomen , 
+```
+```{r}
+M3<- lm(formula = density ~ neck + chest + abdomen + waist , 
     data = data_density)
 summary(M3)
+```
 
+Drop waist and add other variables
+```{r}
+M4<- lm(formula = density ~ neck + chest + abdomen + hip , 
+    data = data_density)
+summary(M4)
+```
+
+```{r}
+M5<- lm(formula = density ~ neck + chest + abdomen + hip + thigh , 
+    data = data_density)
+summary(M5)
+```
+
+Drop chest and add other variables
+```{r}
+M6<- lm(formula = density ~ neck + abdomen + hip + thigh + knee , 
+    data = data_density)
+summary(M6)
+```
+Drop knee
+```{r}
+M7<- lm(formula = density ~ neck + abdomen + hip + thigh , 
+    data = data_density)
+summary(M7)
+```
+
+
+```{r}
 relweights <- function(fit,...){
   R <- cor(fit$model)
   nvar <- ncol(R)
@@ -356,26 +385,27 @@ relweights <- function(fit,...){
            ...)
   return(import)
 }
-relweights(M3, col="blue")
+relweights(M7, col="blue")
 ```
+
+Obviously, abdomen contributes the most in the relationship with body density.
 
 ##### 2.3.4 Fitted model for the model selected by the step-wise procedure.
 $$
-Body Density = 1.0746853 + 0.0011729 \times Height\\
-+ 0.0012053 \times Neck + 0.004285 \times Chest\\ - 0.0020607 \times Abdomen\\
+Body Density = 1.1104052 + 0.0019085 \times Neck\\
+- 0.0022064 \times Abdomen\ + 0.0011314 \times Hip\\ - 0.0006094 \times Thigh\\
 $$
-
-Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 70.4% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
 <ol>
-<li>On average, holding the other variables constant, a 1% increase in Height leads to a 0.0012% unit increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Neck leads to a 0.0012% increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Chest leads to a 0.0043% increase in Density</li>
-<li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.0021% decrease in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Neck leads to a 0.2% unit increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.2% decrease in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Hip leads to a 0.1% increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Thigh leads to a 0.06% decrease in Density</li>
 </ol>
 
 ##### 2.3.5 Linear regression assumptions for the stepwise model
 ```{r}
-autoplot(M3,which=1:2)+theme_bw()
+autoplot(M7,which=1:2)+theme_bw()
 ```
 
 ### 2.4 Age
