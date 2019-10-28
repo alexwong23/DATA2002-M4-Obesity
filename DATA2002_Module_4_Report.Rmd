@@ -18,6 +18,7 @@ library(ggfortify)
 library(GGally)
 library(qtlcharts)
 library(leaps)
+library(sjPlot)
 ```
 
 ***
@@ -93,6 +94,118 @@ summary(pbf_step)
 ```{r }
 autoplot(pbf_step, which = 1:2) + theme_bw()
 ```
+
+## 2. Analysis
+### 2.1 Prediction for Obesity
+Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+
+#### Data import, Processing and Cleaning
+```{r}
+data = read.delim("bodyfat.txt") %>% janitor::clean_names()
+glimpse(data)
+#Introduce BMI Varaible
+data=data %>% mutate(bmi=(data$weight/(data$height^2))*703,)
+#Isolate the dataset only contain Body Measurements
+data_bf = data[-c(1,3:5,17)]
+#Isolate the dataset to only contain Body Measurements and as weight and height were included in the BMI formula, it is also removed
+data_bmi = data[-c(1:5)]
+```
+
+#### Body Fat Percentage
+##### Data Visualisation
+```{r}
+qtlcharts::iplotCorr(data_bf)
+```
+Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
+
+##### Multiple Regression
+```{r}
+bf_lm = lm(pct_bf~.,data=data_bf)
+summary(bf_lm)
+```
+Using the individual p-value method, the varaibles that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
+
+```{r}
+bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
+summary(bf_step_back)
+```
+Based on the backward selection model, the fitted model has become:
+
+$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+
+Finally, to check assumption, we perform the ggfortify function.
+
+```{r}
+par(mfrow=c(1,2))
+plot(bf_step_back,which=1:2) + theme_bw()
+```
+
+The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
+
+##### Final fitted model
+$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+
+#### BMI
+For this analysis, the formula of BMI is $BMI = \frac{Weight (lbs)*703}{Height(in)^2}$
+
+##### Data Visualisation
+```{r}
+qtlcharts::iplotCorr(data_bmi)
+```
+Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
+
+##### Multiple Regression
+
+```{r}
+bmi_lm = lm(bmi~.,data=data_bmi)
+summary(bmi_lm)
+```
+
+Using the individual p-value method, the varaibles that need to be dropped are hip, ankle, bicep, forearm and wrist. To double check, the AIC criterion will also be considered.
+
+```{r}
+bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
+summary(bmi_step_back)
+```
+
+Based on the backward selection model, the fitted model has become:
+
+$\hat{bmi} = -10.94 +0.161chest + 0.127abdomen + 0.050hip + 0.150 thigh - 0.23knee + 0.115forearm $
+
+Finally, to check assumption, we perform the ggfortify function.
+
+```{r}
+par(mfrow=c(1,2))
+plot(bmi_step_back,which=1:2) + theme_bw()
+```
+
+The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a fan shaped plot which indicates that the assumption of homogeneous variance is violated. We can use a log transformed response and re-fit the linear regression.
+
+```{r}
+ln_bmi_lm = lm(log(bmi)~.,data=data_bmi)
+summary(ln_bmi_lm)
+ln_bmi_step_back = step(ln_bmi_lm, direction = "backward",trace = FALSE)
+summary(ln_bmi_step_back)
+par(mfrow=c(1,2))
+plot(ln_bmi_step_back,which=1:2) + theme_bw()
+```
+
+```{r}
+sjPlot::tab_model(bmi_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
+```
+
+
+##### Final Fitted Model
+
+$log(\hat{bmi}) = 1.83 +0.0058chest + 0.0052abdomen + 0.0064 thigh -0.0065knee +        0.0028bicep + 0.0040 forearm $.
+
+#### Conclusion
+```{r}
+sjPlot::tab_model(bf_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
+```
+
+Through looking at the two models, we can see that using simply body measurements, it is easier to predict changes in bmi rather than percentage body fat. From the models, measurements of abdomen appears to have the greatest influence on both body fat and bmi and hence any increase should be treated with caution.
+
 
 
 ### 2.2 Weight
