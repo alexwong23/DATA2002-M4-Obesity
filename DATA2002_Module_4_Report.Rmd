@@ -16,9 +16,10 @@ library(janitor)
 library("readxl")
 library(ggfortify)
 library(GGally)
+install.packages("qtlcharts")
 library(qtlcharts)
-library(leaps)
-library(sjPlot)
+#library(leaps)
+#library(sjPlot)
 library(ggfortify)
 ```
 
