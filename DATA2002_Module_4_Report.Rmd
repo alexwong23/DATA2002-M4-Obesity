@@ -275,8 +275,8 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 98% of 
 
 ##### 2.3.1 Defining the model with population parameters
 $$
-Density = \beta_0 + \beta_1density + \beta_2age + \beta_3weight + \beta_4height\\
-+ \beta_5neck + \beta_6chest + \beta_7abdomen + \beta_8waist + \beta_9hip + \beta_{10}thigh\\ + \beta_{11}knee + \beta_{12}ankle + \beta_{13}bicep + \beta_{14}forearm + \beta_{15}wrist + \epsilon
+Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
++ \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
 ```{r}
 cor_matrix <- cor(data)
@@ -377,17 +377,6 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% 
 ```{r}
 autoplot(M3,which=1:2)+theme_bw()
 ```
-
-**Hypothesis**:
-$$
-H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
-H_1:  \text{ Not all means are the same.}\\
-$$
-**Assumptions:**
-<ol>
-<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
-</ol>
-
 
 ### 2.4 Age
 #### Predicting percentage of body fat from age
@@ -496,9 +485,9 @@ autoplot(age_step, which = 1:2) + theme_bw()
 
 ## 3. Limitations
 <ol>
-<li></li>
-<li></li>
-<li></li>
+<li>Gender Bias</li>
+<li>Privacy Issues</li>
+<li>Age Range</li>
 <li></li>
 </ol>
 ## 4. Conclusion
