@@ -19,6 +19,7 @@ library(GGally)
 library(qtlcharts)
 library(leaps)
 library(sjPlot)
+library(pheatmap)
 ```
 
 ***
@@ -33,15 +34,19 @@ The data set is adapted from th
 
 ### 1.2 Data Import, Processing and Cleaning
 ```{r import_data, message=FALSE, warning=FALSE}
-data = read_tsv("bodyfat.txt", na = c("NA"))
-data = data %>% janitor::clean_names()
-#glimpse(data)
-
+data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
   mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
          overweight = case_when(
           bmi >= 25 ~ "yes",
           bmi < 25 ~ "no"))
+
+colnames(data)
+data_bmi = data[-c(1:2,4:5,18)]
+data_bf = data[-c(1,3:5,17:18)]
+data_density = data[-c(2:5,17:18)]
+
+#glimpse(data)
 ```
 
 ***
@@ -161,6 +166,7 @@ $$
 Density = \beta_0 + \beta_1density + \beta_2age + \beta_3weight + \beta_4height\\
 + \beta_5neck + \beta_6chest + \beta_7abdomen + \beta_8waist + \beta_9hip + \beta_{10}thigh\\ + \beta_{11}knee + \beta_{12}ankle + \beta_{13}bicep + \beta_{14}forearm + \beta_{15}wrist + \epsilon
 $$
+
 ```{r}
 cor_matrix <- cor(data)
 pheatmap(cor_matrix, display_numbers = T,na.rm=T)
@@ -173,7 +179,6 @@ The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relatio
 ```{r}
 data1<-data[,-2]
 ```
-
 ```{r}
 M0 <- lm(density ~ 1, data = data1)  # Null model
 M1 <- lm(density ~ ., data = data1)  # Full model
@@ -194,16 +199,6 @@ plot(exh,scale="bic")
 It is best to choose age, weight, height, neck and chest for conducting the relationship analysis with body density.
 
 ##### 2.3.3 Dropping variables using the AIC starting from the full model
-**Hypothesis**:
-$$
-H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
-H_1:  \text{ Not all means are the same.}\\
-$$
-**Assumptions:**
-<ol>
-<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
-</ol>
-
 ```{r}
 M2<- lm(formula = density ~ age + weight + height + neck + chest + abdomen , 
     data = data1)
@@ -211,7 +206,6 @@ summary(M2)
 M3<- lm(formula = density ~ height + neck + chest + abdomen , 
     data = data1)
 summary(M3)
-
 
 relweights <- function(fit,...){
   R <- cor(fit$model)
@@ -256,7 +250,7 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% 
 <li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.0021% decrease in Density</li>
 </ol>
 
-##### 2.3.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
+##### 2.3.5 Linear regression assumptions for the stepwise model
 ```{r}
 autoplot(M3,which=1:2)+theme_bw()
 ```
