@@ -18,6 +18,7 @@ library(GGally)
 library(qtlcharts)
 library(leaps)
 library(sjPlot)
+library(ggfortify)
 ```
 
 ***
@@ -87,6 +88,7 @@ plot(bf_step_back,which=1:2) + theme_bw()
 
 The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
 
+<<<<<<< HEAD
 ##### Final fitted model
 $\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
 
@@ -112,6 +114,25 @@ Using the individual p-value method, the varaibles that need to be dropped are h
 bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
 summary(bmi_step_back)
 ```
+=======
+### 2.2 Weight
+
+**Hypothesis**:
+$$
+H_0: \alpha_1 = \alpha_1 = ... = \alpha_g \\
+H_1:  \text{ Not all means are the same.}\\
+$$
+**Assumptions:**
+<ol>
+<li>$\epsilon_{ijk} \sim N(0, \sigma^2)$</li>
+</ol>
+
+```{r }
+
+```
+
+### 2.3 Body Density
+>>>>>>> parent of 6bb9b54... add research on weight
 
 Based on the backward selection model, the fitted model has become:
 
