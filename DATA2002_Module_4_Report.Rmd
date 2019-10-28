@@ -37,11 +37,6 @@ The data set is adapted from th
 
 
 ```{r import_data, message=FALSE, warning=FALSE}
-<<<<<<< HEAD
-data = read_tsv("bodyfat.txt", na = c("NA"))
-data = data %>% janitor::clean_names()
-glimpse(data)
-=======
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
   mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
@@ -55,7 +50,6 @@ data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
 
 #glimpse(data)
->>>>>>> 740e89f08de86938d5428239b5eb0968f8fc0cdf
 ```
 
 ***
