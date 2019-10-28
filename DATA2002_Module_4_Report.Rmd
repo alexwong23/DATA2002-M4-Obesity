@@ -38,8 +38,8 @@ data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
   mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
          overweight = case_when(
-          bmi >= 25 ~ "yes",
-          bmi < 25 ~ "no"))
+          bmi >= 25 ~ 1,
+          bmi < 25 ~ 0))
 
 colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
@@ -180,12 +180,7 @@ It is best to choose age, weight, height, neck and chest for conducting the rela
 
 ##### 2.3.3 Dropping variables using the AIC starting from the full model
 ```{r}
-M2<- lm(formula = density ~ age + weight + height + neck + chest + abdomen , 
-    data = data1)
-summary(M2)
-M3<- lm(formula = density ~ height + neck + chest + abdomen , 
-    data = data1)
-summary(M3)
+
 
 relweights <- function(fit,...){
   R <- cor(fit$model)
@@ -239,8 +234,19 @@ autoplot(M3,which=1:2)+theme_bw()
 ```{r}
 sjPlot::tab_model(bf_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
 ```
-
 Through looking at the three models, we can see that using simply body measurements, it is easier to predict changes in bmi rather than percentage body fat. From the models, measurements of abdomen appears to have the greatest influence on both body fat and bmi and hence any increase should be treated with caution.
+
+```{r}
+data %>% 
+  ggplot() + 
+  aes(x = pct_bf, y = overweight) + 
+  geom_point(size = 10, alpha = 0.1) + 
+  theme_classic(base_size = 10)
+
+glm1 = glm(overweight ~ pct_bf + bmi + density, data = data)
+summary(glm1)
+```
+
 
 ## 3. Limitations
 <ol>
