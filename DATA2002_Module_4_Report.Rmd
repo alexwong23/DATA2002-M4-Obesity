@@ -366,10 +366,10 @@ $$
 
 Looking at the $R^2$ value (multiple R-squared) from the summary output, 71.39% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
 <ol>
-<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0012% unit increase in Height</li>
-<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0012% increase in Neck</li>
-<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0043% increase in Chest</li>
-<li>On average, holding the other variables constant, a 1% increase in Density leads to a 0.0021% decrease in Abdomen</li>
+<li>On average, holding the other variables constant, a 1% increase in Height leads to a 0.0012% unit increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Neck leads to a 0.0012% increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Chest leads to a 0.0043% increase in Density</li>
+<li>On average, holding the other variables constant, a 1% increase in Abdomen leads to a 0.0021% decrease in Density</li>
 </ol>
 
 ##### 2.3.5 Linear regression assumptions for the stepwise model - why do this? same as previous??
