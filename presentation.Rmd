@@ -1,0 +1,110 @@
+---
+title: "DATA2002 Module 4 Report"
+subtitle: "A reaserch on obesity"
+author: "Group 9 (460352996,480407614,480145820,470066919)"
+date: "29 October 2019"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/sydney-fonts.css", "assets/sydney.css"]
+    self_contained: false # if true, fonts will be stored locally
+    seal: true # show a title slide with YAML information
+    includes:
+      in_header: "assets/mathjax-equation-numbers.html"
+    nature:
+      beforeInit: ["assets/remark-zoom.js", "https://platform.twitter.com/widgets.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9' # alternatives '16:9' or '4:3' or others e.g. 13:9
+      navigation:
+        scroll: false # disable slide transitions by scrolling
+---
+## 1. Introduction to our data
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+library(tidyverse)
+library(knitr)
+library(janitor)
+library("readxl")
+library(ggfortify)
+library(GGally)
+library(qtlcharts)
+library(leaps)
+library(sjPlot)
+library(kableExtra)
+library(pheatmap)
+library(jtools)
+```
+.scroll-output[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+data = read.delim("bodyfat.txt") %>% janitor::clean_names()
+data = data %>%
+  mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
+         overweight = case_when(
+          bmi >= 25 ~ 1,
+          bmi < 25 ~ 0))
+
+colnames(data)
+data_bmi = data[-c(1:2,4:5,18)]
+data_bf = data[-c(1,3:5,17:18)]
+data_density = data[-c(2:5,17:18)]
+#colnames(data_density)
+glimpse(data)
+```
+]
+
+---
+## 2. Analysis
+### Prediction for Obesity
+Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+---
+## 2.1 Body Fat Percentage
+.pull-left[
+###2.1.1 Data Visualisation
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+qtlcharts::iplotCorr(data_bf)
+```
+
+Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
+]
+--
+.pull-right[
+###2.1.2 Multiple Regression
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+bf_lm = lm(pct_bf~.,data=data_bf)
+summ(bf_lm)
+```
+]
+Using the individual p-value method, the varaibles that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
+]
+---
+## 2.1 Body Fat Percentage
+.pull-left[
+### 2.1.3 backward selection model
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
+summ(bf_step_back)
+```
+]
+Based on the backward selection model, the fitted model has become:
+
+$$\hat{body_fat} = 1.52 -0.396neck - 0.128chest $$ $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
+]
+
+--
+
+.pull-right[
+### 2.1.4 Check Assumptions
+Finally, to check assumption, we perform the ggfortify function.
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+par(mfrow=c(1,2))
+plot(bf_step_back,which=1:2) + theme_bw()
+```
+]
+######The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
+]
+---
+## 2.1.4 Final fitted model
+$$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest+1.01805abdomen$$ $$-0.28758hip + 0.26bicep -1.55084wrist$$
