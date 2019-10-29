@@ -35,6 +35,7 @@ library(pheatmap)
 library(jtools)
 library(partykit)
 library(rpart)
+library(caret)
 ```
 .scroll-output[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
@@ -117,49 +118,52 @@ $$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest+1.01805abdomen$$ $$-0.28758hip 
 ### 2.4.1 Logistical Regression
 .scroll-box-10[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
-glm13 = glm(overweight ~ chest + abdomen + bicep, data = data_overweight)
-summ(glm13)
+glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
+summ(glm12)
 ```
 ]
 ##### Fitted Model (log-odds scale):
-$$logit(p)=log(\frac{p}{1-p})=-3.845275+0.013281Chest $$
-$$+0.020164Abdomen+0.035618Bicep$$
+$$logit(p)=log(\frac{p}{1-p})=-75.89380+0.37854Chest$$
+$$+0.27128Abdomen+0.22381Thigh$$
 ]
 --
 .pull-right[
 ### 2.4.2 Visualise Coefficients
 .scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
-plot_model(glm13, type = "pred", terms = c("abdomen", "chest", "bicep"), show.data = TRUE) +
-  theme_bw(base_size = 20)
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 20)
 ```
 ]
 ]
 ---
 ## 2.4 Predicting if a person is Overweight
 .pull-left[
-### 2.4.3 Resubstitution Error Rate
-.scroll-box-10[
-```{r,message=FALSE, warning=FALSE}
-glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
-data = data %>%
+### 2.4.3 Prediction Accuracy
+```{r,message=FALSE, warning=FALSE, echo=FALSE}
+glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
+data = data %>% 
   mutate(pred_prob = predict(glm0, type = "response"),
          pred_surv = round(pred_prob))
-mean(data$overweight == data$pred_surv)
+
+#1 - mean(data$overweight != data$pred_surv)
+confusion.glm = confusionMatrix(
+  data = as.factor(data$pred_surv),
+  reference = as.factor(data$overweight))
+confusion.glm$table
 ```
-]
-Our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is **8.8%**.
-]
---
-.pull-right[
-### 2.4.4 Decision Tree
-.scroll-box-20[
+The accuracy of our predictions is **92%**.
+
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 data_overweight$overweight=as.character(data_overweight$overweight)
 
 ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.008))
 ov_tree
-plot(as.party(ov_tree))
 ```
 ]
+--
+.pull-right[
+### 2.4.4 Decision Tree
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+plot(as.party(ov_tree))
+```
 ]
