@@ -83,6 +83,7 @@ Lastly, a binary indicator will be added to differentiate the sample into over-w
 ***
 
 ## 2. Analysis
+<<<<<<< HEAD
 Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density. 
 
 ### 2.1 Body Fat Percentage
@@ -93,6 +94,13 @@ Pcf.BF = \beta_0 + \beta_1Weight + \beta_2Height
 + \beta_3Neck + \beta_4Chest \\ + \beta_5Abdomen + \beta_6Waist + \beta_7Hip + \beta_8Thigh + \beta_9Knee + \beta_{10}Ankle \\+ \beta_{11}Bicep + \beta_{12}Forearm + \beta_{13}Wrist + \epsilon
 $$
 
+=======
+###### Prediction for Obesity
+Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+
+## 2.1 Body Fat Percentage
+##### 2.1.1 Data Visualisation
+>>>>>>> 699b32c5c2d9581d6e91ed3d5569cba73d5e1b0a
 ```{r}
 qtlcharts::iplotCorr(data_bf)
 ```
