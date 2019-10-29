@@ -413,8 +413,9 @@ autoplot(M7,which=1:2)+theme_bw()
 Since overweight is a binary field.. logistical regression....
 
 ##### 2.4.1 Checking for Significance in a Logistic Regression
-```{r}
+```{r,warning=FALSE}
 data_overweight = data[-c(4:5,17)]
+data_overweight$overweight = as.numeric(data_overweight$overweight)
 glm1 = glm(overweight ~ ., data = data_overweight)
 # drop knee
 glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + ankle + bicep + forearm + wrist, data = data_overweight)
@@ -468,6 +469,7 @@ Comparing the three individual graphs, the slight difference in the slope's y ax
 ##### 2.4.4 Predictions
 We correctly classified 91.2% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.8%.
 ```{r}
+data$overweight = as.numeric(data$overweight)
 glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
 data = data %>% 
   mutate(pred_prob = predict(glm0, type = "response"),
@@ -505,6 +507,7 @@ predict(glm13, newdata = predict_overweight, type = "link")
 ```{r message=FALSE}
 library(partykit)
 library(rpart)
+data_overweight$overweight=as.character(data_overweight$overweight)
 ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.009))
 ov_tree
 plot(as.party(ov_tree))
