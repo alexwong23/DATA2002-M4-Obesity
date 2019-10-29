@@ -414,115 +414,103 @@ Since the variable 'Overweight' is dichotomous (binary), we perform a logistical
 
 ##### 2.4.1 Checking for Significance in a Logistic Regression
 ```{r}
-glm1 = glm(overweight ~ ., data = data_overweight)
-# drop knee
-glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + ankle + bicep + forearm + wrist, data = data_overweight)
-# drop ankle
-glm3 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop density
-glm4 = glm(overweight ~ pct_bf + age + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop age
-glm5 = glm(overweight ~ pct_bf + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop waist
-glm6 = glm(overweight ~ pct_bf + neck + chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop neck
-glm7 = glm(overweight ~ pct_bf + chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop pct_bf
-glm8 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop waist
-glm9 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm, data = data_overweight)
-# drop wrist
-glm10 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm, data = data_overweight)
-# drop forearm
-glm11 = glm(overweight ~ chest + abdomen + hip + thigh + bicep, data = data_overweight)
-# drop thigh
-glm12 = glm(overweight ~ chest + abdomen + hip + bicep, data = data_overweight)
+glm1 = glm(overweight ~ ., family = binomial, data = data_overweight)
 # drop hip
-glm13 = glm(overweight ~ chest + abdomen + bicep, data = data_overweight)
-summary(glm13)
+glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + knee + thigh + ankle + bicep + forearm + wrist, family = binomial, data = data_overweight)
+# drop neck
+glm3 = glm(overweight ~ density + pct_bf + age + chest + abdomen + waist + knee + thigh + ankle + bicep + forearm + wrist, family = binomial, data = data_overweight)
+# drop forearm
+glm4 = glm(overweight ~ density + pct_bf + age + chest + abdomen + waist + knee + thigh + ankle + bicep + wrist, family = binomial, data = data_overweight)
+# drop pct_bf
+glm5 = glm(overweight ~ density + age + chest + abdomen + waist + knee + thigh + ankle + bicep + wrist, family = binomial, data = data_overweight)
+# drop wrist
+glm6 = glm(overweight ~ density + age + chest + abdomen + waist + knee + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop age
+glm7 = glm(overweight ~ density + chest + abdomen + waist + knee + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop knee
+glm8 = glm(overweight ~ density + chest + abdomen + waist + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop ankle
+glm9 = glm(overweight ~ density + chest + abdomen + waist + thigh + bicep, family = binomial, data = data_overweight)
+# drop waist
+glm10 = glm(overweight ~ density + chest + abdomen + thigh + bicep, family = binomial, data = data_overweight)
+# drop density
+glm11 = glm(overweight ~ chest + abdomen + thigh + bicep, family = binomial, data = data_overweight)
+# drop bicep
+glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
+summary(glm12)
 ```
 Before we start making predictions with the model, we drop the variables which are not a significant predictor for being overweight. The fitted model is shown below.
 
 ##### 2.4.2 Fitted Model (log odds scale)
 $$
-logit(p) = log(\frac{p}{1-p})  = -3.845275 + 0.013281 \times Chest\\
-+ 0.020164 \times Abdomen\ + 0.035618 \times Bicep\\
+logit(p) = log(\frac{p}{1-p})  = -75.89380 + 0.37854Chest\\
++ 0.27128Abdomen\ + 0.22381Thigh\\
 $$
 where the logit(p) is a special link from our linear combination of predictors to the probability of the outcome being equal to 1, and the coefficients are interpreted as changes in log-odds.
 
 
 ##### 2.4.3 Visualisation and Output of the model coefficients (odds scale)
 ```{r message=FALSE}
-tab_model(glm13)
-plot_model(glm13) + theme_bw(base_size = 10) + ylim(0, 0.10) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale")
-plot_model(glm13, type = "pred", terms = c("abdomen", "chest", "bicep"), show.data = TRUE) +
-  theme_bw(base_size = 10)
+tab_model(glm12)
+plot_model(glm12) + theme_bw(base_size = 10) + ylim(1, 2) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale")
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 10)
 ```
 
 In the Coefficient graph, the three significant variables have similar odd ratios giving the model a smaller confidence interval.
 
-From the Prediction graph, the positive slopes in the highlighted areas indicate a larger abdomen and chest circumference leads to a high probability of being overweight.
-Comparing the three individual graphs, the slight difference in the slope's y axis indicates bicep circumference correlates with odds of being overweight.
+From the Prediction graph, the positive slopes indicate a larger abdomen circumference leads to a high probability of being overweight.
+Comparing the three individual graphs, the steeper slope indicates bicep circumference correlates with odds of being overweight.
 
-##### 2.4.4 Predictions
-We correctly classified 91.2% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.8%.
+##### 2.4.4 Evaluating (in-sample) performance
+We correctly classified 92% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.0%.
 ```{r}
-glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
+glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
 data = data %>% 
   mutate(pred_prob = predict(glm0, type = "response"),
          pred_surv = round(pred_prob))
+
+data_overweight = data[-c(4:5,17)]
+
 mean(data$overweight == data$pred_surv)
 ```
 
-**The odds of being overweight for someone with an above average abdomen circumference of 120 is 1.26.**
 ```{r}
-predict_overweight = data.frame(abdomen = 130, chest = mean(data$chest), bicep = mean(data$bicep))
-predict(glm13, newdata = predict_overweight, type = "link")
+library(caret)
+confusion.glm = confusionMatrix(
+  data = as.factor(data$pred_surv),
+  reference = as.factor(data$overweight))
+#confusion.glm$table
+confusion.glm 
 ```
-**The odds of being overweight for someone with a below average abdomen circumference of 60 is -0.15.**
+Based on the matrix above, out of the 117 + 8 not overweight people, the model successfully predicts 117 of them. Out of the 113 + 12 overweight people, the model successfully predicts 113 of them.
+
+**The odds of being overweight for someone with an above average abdomen circumference of 110 is 5.31.**
 ```{r}
-predict_overweight = data.frame(abdomen = 60, chest = mean(data$chest), bicep = mean(data$bicep))
-predict(glm13, newdata = predict_overweight, type = "link")
+predict_overweight = data.frame(abdomen = 110, chest = mean(data$chest), thigh = mean(data$thigh))
+predict(glm12, newdata = predict_overweight, type = "link")
 ```
-**The odds of being overweight for someone with above average circumferences for their abdomen, chest, and bicep is 1.37.**
+**The odds of being overweight for someone with a below average abdomen circumference of 65 is -6.90.**
 ```{r}
-predict_overweight = data.frame(abdomen = mean(data$abdomen)*1.2, chest = mean(data$chest)*1.2, bicep = mean(data$bicep)*1.2)
-predict(glm13, newdata = predict_overweight, type = "link")
+predict_overweight = data.frame(abdomen = 65, chest = mean(data$chest), thigh = mean(data$thigh))
+predict(glm12, newdata = predict_overweight, type = "link")
+```
+**The odds of being overweight for someone with slightly above average circumferences for their abdomen, chest, and bicep is 8.146941.**
+```{r}
+predict_overweight = data.frame(abdomen = mean(data$abdomen)*1.1, chest = mean(data$chest)*1.1, thigh = mean(data$thigh)*1.1)
+predict(glm12, newdata = predict_overweight, type = "link")
 ```
 
 
 ##### 2.4.5 Decision Tree
 ```{r}
-data_overweight$overweight=as.character(data_overweight$overweight)
-
-ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.008))
+data$overweight=as.character(data$overweight)
+ov_tree = rpart(overweight ~ abdomen + chest + thigh, data = data, method = "class",control = rpart.control(cp = 0.008))
 ov_tree
 plot(as.party(ov_tree))
 ```
 
 Out of a total of 250 observations, **96%** of people with a chest circumference greater or equal to 101.55cm are overweight. Also, of the people with a chest circumference less than 101.55cm, those with an abdomen circumference greater or equal to 92.6cm are **72%** likely to be overweight. On the other hand, those with an abdomen circumference less than 92.6cm are **92%** likely to be NOT overweight.
 
-
-##### Evaluating (out-of-sample) performance
-```{r}
-library(e1071)
-overweight_complete = data_overweight %>% select(overweight, abdomen, chest, bicep) %>% drop_na()
-#train(overweight ~ abdomen + chest + bicep, data = overweight_complete,
-#      method = "rpart", trControl = trainControl(method = "cv", number = 10))
-```
-
-
-
-```{r}
-#library(caret)
-#confusion.glm = confusionMatrix(
-#  data = as.factor(data_overweight$pred_surv), 
-#  reference = as.factor(data_overweight$overweight))
-#confusion.glm$table
-#ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class")
-#ov_1_pred = predict(ov_tree, type = "class")
-#confusionMatrix(data=ov_1_pred, reference = data_overweight$overweight)$table
-```
 
 #### 2.5.1 Interpretation
 
