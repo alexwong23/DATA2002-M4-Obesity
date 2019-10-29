@@ -26,10 +26,11 @@ library(pheatmap)
 
 ## 1. Introduction
 
-The data set is adapted from th  
+Excess weight, especially obesity, has become an epidemic in the 21st century and resulted in many significant health and economic consequences for the global population (Stein and Colditz, 2004). In Australia, this epidemic has also spread as 2 in 3 adults are classified as overweight or obese (Australian Institute of Health and Welfare). Researches has shown that this epidemic is more common in males than females and hence, BYU Human Performance Research Center has collected data from 250 men of various age and obtained estimates of the percentage of body fat through underwater weighing and various body circumference measurements (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is difficult to calculate in real life, the value for body fat percentage was derived from body density using the Siri’s 1956 equation.
+
 
 ### 1.1 Sampling method and potential biases
-
+There were not many information given with regards to the sampling method. However, from looking at the dataset, there is gender biase as the epidemic question is one related to both gender, yet only male were involved in the sample. This suggests that any analysis based on this dataset cannot be applied to the whole population but only the male population.
 
 
 ### 1.2 Data import, processing and cleaning
@@ -40,7 +41,7 @@ data = data %>%
          overweight = case_when(
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
-
+data$overweight = as.character(data$overweight)
 #colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
@@ -49,19 +50,56 @@ colnames(data_density)
 #glimpse(data)
 ```
 
-***
-## 2. Analysis
-### Prediction for Obesity
-Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+### 1.3 Data Visualisation
 
-#### 2.1 Body Fat Percentage
-##### 2.1.1 Data Visualisation
+#### 1.3.1 Obesity and Age
+```{r}
+ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severness of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Over-Weight", "Over-Weight"))
+```
+
+From looking at the graph, it can be observed that most of the sample comes from the age group between 40-60 and the number of people who appear to be over-weight seems to be distributed evenly across the population.
+
+#### 1.3.2 Body Measurements
+
+```{r}
+boxplot(data$neck,data$chest,data$abdomen,data$waist,data$bicep,data$forearm,data$wrist,main = "Upper Body Measurements",names = c("Neck","Chest","Abdomen","Waist","Bicep","Forearm","Wrist"))
+boxplot(data$hip,data$knee,data$thigh,data$ankle,main = "Lower Body Measurements",names = c("Hip","Knee","Thigh","Ankle"))
+```
+
+From the two boxplots, the body measurement dataset appears relatively symmetrical and contains a few outliers. This may propose some problems in the later stages of the analysis.
+
+### 1.4 Analysis Approach
+This report aims to determine an alternative method to determine "over-weight" individuals oppose to body fat percentage and the two alternative methods considered are:
+
+1. BMI
+2. Body Density
+
+The analysis will first begin through determining how much variation in body fat percentage can be explained by simply body measurements and the number of measurements that is significant in building an accurate prediction model to examine the ease of calculation.
+
+Then similar analysis will be conducted on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements and offers easier and simpler interpretation.
+
+Lastly, a binary indicator will be added to differentiate the sample into over-weight individuals (Yes) and non-over-weight individuals (No) using body-fat percentage as the guiding criteria. A logstic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
+
+***
+
+## 2. Analysis
+Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density. 
+
+### 2.1 Body Fat Percentage
+#### 2.1.1 Defining the model with population parameters
+
+$$
+Pcf.BF = \beta_0 + \beta_1Weight + \beta_2Height
++ \beta_3Neck + \beta_4Chest \\ + \beta_5Abdomen + \beta_6Waist + \beta_7Hip + \beta_8Thigh + \beta_9Knee + \beta_{10}Ankle \\+ \beta_{11}Bicep + \beta_{12}Forearm + \beta_{13}Wrist + \epsilon
+$$
+
 ```{r}
 qtlcharts::iplotCorr(data_bf)
 ```
-Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
 
-##### 2.1.2 Multiple Regression
+Based on the interactive correlation matrix above, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
+
+#### 2.1.2 Multiple Regression and Variable Selection
 ```{r}
 bf_lm = lm(pct_bf~.,data=data_bf)
 summary(bf_lm)
@@ -74,9 +112,9 @@ summary(bf_step_back)
 ```
 Based on the backward selection model, the fitted model has become:
 
-$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+$$ \hat{Body - Fat} = 1.52 -0.3965Neck - 0.128Chest + 1.01805Abdomen -0.28758Hip + 0.26Vicep -1.55084Wrist $$
 
-##### 2.1.3 Check Assumptions
+#### 2.1.3 Check Assumptions
 Finally, to check assumption, we perform the ggfortify function.
 ```{r}
 par(mfrow=c(1,2))
@@ -85,19 +123,72 @@ plot(bf_step_back,which=1:2) + theme_bw()
 
 The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
 
-##### 2.1.4 Final fitted model
-$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $
+#### 2.1.4 Final fitted model
+```{r}
+relbf <- function(fit,...){
+  R <- cor(fit$model)
+  nvar <- ncol(R)
+  rxx <- R[2:nvar, 2:nvar]
+  rxy <- R[2:nvar, 1]
+  svd <- eigen(rxx)
+  evec <- svd$vectors
+  ev <- svd$values
+  delta <- diag(sqrt(ev))
+  lambda <- evec %*% delta %*% t(evec)
+  lambdasq <- lambda ^ 2
+  beta <- solve(lambda) %*% rxy
+  rsquare <- colSums(beta ^ 2)
+  rawwgt <- lambdasq %*% beta ^ 2
+  import <- (rawwgt / rsquare) * 100
+  import <- as.data.frame(import)
+  row.names(import) <- names(fit$model[2:nvar])
+  names(import) <- "Weights"
+  import <- import[order(import),1, drop=FALSE]
+  dotchart(import$Weights, labels=row.names(import),
+           xlab="% of R-Square", pch=19,
+           main="Relative Importance of Predictor Variables",
+           sub=paste("Total R-Square=", round(rsquare, digits=3)),
+           ...)
+  return(import)
+}
+relbf(bf_step_back, col="blue")
+```
 
-#### 2.2 BMI
-For this analysis, the formula of BMI is $BMI = \frac{Weight (lbs)*703}{Height(in)^2}$
+The final model is:
 
-##### 2.2.1 Data Visualisation
+$$ \hat{body-fat} = 1.52 -0.3965neck - 0.128chest + 1.01805abdomen -0.28758hip + 0.26bicep -1.55084wrist $$
+
+and abdomen is relatively the most important predictor for predicting body fat percentage.
+
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 73.5% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
+
+<ol>
+<li>On average, holding the other variables constant, a 1 unit increase in Neck leads to a 0.3965 unit decrease in Body Fat Percentage </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Chest leads to a 0.128 unit decrease in Body Fat Percentage </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Abdomen leads to a 1.01805 unit increase in Body Fat Percentage </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Hip leads to a 0.28758 unit decrease in Body Fat Percentage </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Bicep leads to a 0.26 unit increase in Body Fat Percentage </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Wrist leads to a 1.5508 unit decrease in Body Fat Percentage </li>
+</ol>
+
+### 2.2 BMI
+For this analysis, the formula of BMI is 
+
+$$ BMI = \frac{Weight (lbs)*703}{Height(in)^2} $$
+
+#### 2.2.1 Defining the model with population parameters
+
+$$
+BMI = \beta_0 + \beta_1Neck + \beta_2Chest \\ + \beta_3Abdomen + \beta_4Waist + \beta_5Hip + \beta_6Thigh + \beta_7Knee + \beta_8Ankle \\+ \beta_9Bicep + \beta_{10}Forearm + \beta_{11}Wrist + \epsilon
+$$
+
 ```{r}
 qtlcharts::iplotCorr(data_bmi)
 ```
-Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
 
-##### 2.2.2 Multiple Regression
+Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is also adopted here.
+
+#### 2.2.2 Multiple Regression with Variable Selection
 
 ```{r}
 bmi_lm = lm(bmi~.,data=data_bmi)
@@ -113,9 +204,9 @@ summary(bmi_step_back)
 
 Based on the backward selection model, the fitted model has become:
 
-$\hat{bmi} = -10.94 +0.161chest + 0.127abdomen + 0.050hip + 0.150 thigh - 0.23knee + 0.115forearm $
+$$ \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
 
-##### 2.2.3 Check Assumptions
+#### 2.2.3 Check Assumptions
 Finally, to check assumption, we perform the ggfortify function.
 
 ```{r}
@@ -124,6 +215,9 @@ plot(bmi_step_back,which=1:2) + theme_bw()
 ```
 
 The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a fan shaped plot which indicates that the assumption of homogeneous variance is violated. We can use a log transformed response and re-fit the linear regression.
+
+The new model will become:
+$log(\hat{bmi}) = 1.83 +0.0058chest + 0.0052abdomen + 0.0064 thigh -0.0065knee +        0.0028bicep + 0.0040 forearm $.
 
 ```{r}
 ln_bmi_lm = lm(log(bmi)~.,data=data_bmi)
@@ -138,13 +232,57 @@ plot(ln_bmi_step_back,which=1:2) + theme_bw()
 sjPlot::tab_model(bmi_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
 ```
 
-##### 2.2.4 Final Fitted Model
+However, although the transformation has aided with the homogeneous variance assumption, the interpretation itself does not make much sense - BMI is determined by an increase in value, not the increase in percentage change. Hence in the final comparison, we will use the untransformed model.
 
-$log(\hat{bmi}) = 1.83 +0.0058chest + 0.0052abdomen + 0.0064 thigh -0.0065knee +        0.0028bicep + 0.0040 forearm $.
+#### 2.2.4 Final Fitted Model
+```{r}
+relbmi <- function(fit,...){
+  R <- cor(fit$model)
+  nvar <- ncol(R)
+  rxx <- R[2:nvar, 2:nvar]
+  rxy <- R[2:nvar, 1]
+  svd <- eigen(rxx)
+  evec <- svd$vectors
+  ev <- svd$values
+  delta <- diag(sqrt(ev))
+  lambda <- evec %*% delta %*% t(evec)
+  lambdasq <- lambda ^ 2
+  beta <- solve(lambda) %*% rxy
+  rsquare <- colSums(beta ^ 2)
+  rawwgt <- lambdasq %*% beta ^ 2
+  import <- (rawwgt / rsquare) * 100
+  import <- as.data.frame(import)
+  row.names(import) <- names(fit$model[2:nvar])
+  names(import) <- "Weights"
+  import <- import[order(import),1, drop=FALSE]
+  dotchart(import$Weights, labels=row.names(import),
+           xlab="% of R-Square", pch=19,
+           main="Relative Importance of Predictor Variables",
+           sub=paste("Total R-Square=", round(rsquare, digits=3)),
+           ...)
+  return(import)
+}
+relbmi(bmi_step_back, col="blue")
+```
+
+The final model is:
+
+$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
+and both chest and abdomen are relatively more important in predicting BMI.
+
+Looking at the $R^2$ value (multiple R-squared) from the summary output, 90.2% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
+<ol>
+<li>On average, holding the other variables constant, a 1 unit increase in Chest leads to a 0.161 unit increase in BMI </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Abdomen leads to a 0.127 unit increase in BMI </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Hip leads to a 0.050 unit increase in BMI </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Thigh leads to a 0.15 unit increase in BMI </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Knee leads to a 0.23 unit decrease in BMI </li>
+<li>On average, holding the other variables constant, a 1 unit increase in Forearm leads to a 0.115 unit decrease in  BMI </li>
+</ol>
 
 
-#### 2.3 Body Density
-##### 2.3.1 Defining the model with population parameters
+### 2.3 Body Density
+#### 2.3.1 Defining the model with population parameters
 $$
 Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
@@ -161,7 +299,7 @@ pheatmap(cor_matrix, display_numbers = T,na.rm=T)
 
 Above matrix has shown the interactice correlation between variables. Notbaly, Pct.BF has a -0.99 relationship with Density, which means Pct.BF could be used to explain Density. Meanwhile, variables having similar properties are linked together, which could be useful for generating groups.
 
-##### 2.3.2 Check Assumptions
+#### 2.3.2 Check Assumptions
 The residuals $\epsilon_i$ are iid $N(0,\sigma^2)$ and there is a linear relationship between y and x.
 
 ```{r}
@@ -182,7 +320,7 @@ plot(exh,scale="bic")
 ```
 
 
-##### 2.3.3 Adding variables using the BIC
+#### 2.3.3 Multiple Regression using the BIC
 ```{r}
 M2<- lm(formula = density ~ neck + chest + abdomen, 
     data = data_density)
@@ -221,6 +359,9 @@ M7<- lm(formula = density ~ neck + abdomen + hip + thigh ,
 summary(M7)
 ```
 
+
+
+#### 2.3.4 Final Fitted Model
 ```{r}
 relweights <- function(fit,...){
   R <- cor(fit$model)
@@ -253,7 +394,7 @@ relweights(M7, col="blue")
 
 Obviously, abdomen contributes the most in the relationship with body density.
 
-##### 2.3.4 Fitted model for the model selected by the step-wise procedure.
+The final model is:
 $$
 Body Density = 1.1104052 + 0.0019085 \times Neck\\
 - 0.0022064 \times Abdomen\ + 0.0011314 \times Hip\\ - 0.0006094 \times Thigh\\
@@ -266,17 +407,23 @@ Looking at the $R^2$ value (multiple R-squared) from the summary output, 70.4% o
 <li>On average, holding the other variables constant, a 1% increase in Thigh leads to a 0.06% decrease in Density</li>
 </ol>
 
-##### 2.3.5 Linear regression assumptions for the stepwise model
+#### 2.3.5 Linear regression assumptions for the stepwise model
 ```{r}
 autoplot(M7,which=1:2)+theme_bw()
 ```
 
 
-#### 2.4 Conclusion
+### 2.4 Conclusion
 ```{r}
-sjPlot::tab_model(bf_step_back, ln_bmi_step_back, digits = 5, show.ci = FALSE)
+sjPlot::tab_model(bf_step_back, bmi_step_back, M7, digits = 5, show.ci = FALSE)
 ```
-Through looking at the three models, we can see that using simply body measurements, it is easier to predict changes in bmi rather than percentage body fat. From the models, measurements of abdomen appears to have the greatest influence on both body fat and bmi and hence any increase should be treated with caution.
+
+Through looking at the three models, body measurements appears to be able to explain most variations in BMI, followed by body fat percentage and then density. This suggests that if we only have simple body measurements on hand, it is better to use BMI as a source to determine obesity.
+
+Abdomen has also been identified as the most significant factor (relatively) for prediction across all three methods and hence in normal day-to-day life, it is important to monitor the measurement for abdomen to avoid any weight-related sickness.
+
+### 2.5 Logistic Regression
+Using body fat percentage as the main guidance, we have identified ___% as overweight. This model aims to look at 
 
 ```{r}
 data %>% 
@@ -288,6 +435,8 @@ data %>%
 glm1 = glm(overweight ~ pct_bf + bmi + density, data = data)
 summary(glm1)
 ```
+
+#### 2.5.1 Interpretation
 
 
 ## 3. Limitations
@@ -301,6 +450,12 @@ summary(glm1)
 
 ## 5. References
 <ol>
-<li>  </li>
+<li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
+
+</li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+
+</li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+
+</li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
 </ol> 
 
