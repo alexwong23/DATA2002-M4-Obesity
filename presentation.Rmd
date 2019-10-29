@@ -128,10 +128,10 @@ $$+0.27128Abdomen+0.22381Thigh$$
 ]
 --
 .pull-right[
-### 2.4.2 Visualise Coefficients
+### 2.4.2 Visualise Predictions
 .scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
-plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 20)
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 20) + labs(caption='Source: SOCR Data')
 ```
 ]
 ]

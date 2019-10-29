@@ -454,8 +454,8 @@ where the logit(p) is a special link from our linear combination of predictors t
 ```{r message=FALSE, warning=FALSE}
 summary(glm12)
 #tab_model(glm0, transform = NULL)
-plot_model(glm12) + theme_bw(base_size = 10) + ylim(1, 2) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale")
-plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 10)
+plot_model(glm12) + theme_bw(base_size = 10) + ylim(1, 2) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale",caption='Source: SOCR Data')
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 10) + labs(caption='Source: SOCR Data')
 ```
 
 In the Coefficient graph, the three significant variables have similar odd ratios giving the model a smaller confidence interval.
