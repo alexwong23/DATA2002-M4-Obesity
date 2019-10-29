@@ -89,7 +89,7 @@ summ(bf_step_back)
 ]
 Based on the backward selection model, the fitted model has become:
 
-$$\hat{body_fat} = 1.52 -0.396neck - 0.128chest $$ $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
+$$\hat{body-fat} = 1.52 -0.396neck - 0.128chest $$ $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
 ]
 
 --

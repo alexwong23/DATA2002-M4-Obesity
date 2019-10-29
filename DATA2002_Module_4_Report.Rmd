@@ -98,9 +98,9 @@ $$
 ###### Prediction for Obesity
 Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
 
-## 2.1 Body Fat Percentage
+### 2.1 Body Fat Percentage
 ##### 2.1.1 Data Visualisation
->>>>>>> 699b32c5c2d9581d6e91ed3d5569cba73d5e1b0a
+
 ```{r}
 qtlcharts::iplotCorr(data_bf)
 ```
