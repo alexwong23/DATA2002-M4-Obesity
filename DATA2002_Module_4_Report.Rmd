@@ -20,6 +20,8 @@ library(qtlcharts)
 library(leaps)
 library(sjPlot)
 library(pheatmap)
+library(partykit)
+library(rpart)
 ```
 
 ***
@@ -470,13 +472,6 @@ data = data %>%
   mutate(pred_prob = predict(glm0, type = "response"),
          pred_surv = round(pred_prob))
 mean(data$overweight == data$pred_surv)
-
-# not working
-#library(caret)
-#confusion.glm = confusionMatrix(
-#  data = as.factor(data$pred_surv), 
-#  reference = as.factor(data$overweight))
-#confusion.glm$table
 ```
 
 **The odds of being overweight for someone with an above average abdomen circumference of 120 is 1.26.**
@@ -496,12 +491,18 @@ predict(glm13, newdata = predict_overweight, type = "link")
 ```
 
 
+##### 2.4.5 Decision Tree
+```{r}
+data_overweight$overweight=as.character(data_overweight$overweight)
 
-##### DECISION TREE NOT WORKING delete??
+#library(caret)
+#confusion.glm = confusionMatrix(
+#  data = as.factor(data_overweight$pred_surv), 
+#  reference = as.factor(data_overweight$overweight))
+#confusion.glm$table
+```
 
-```{r message=FALSE}
-library(partykit)
-library(rpart)
+```{r}
 ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.009))
 ov_tree
 plot(as.party(ov_tree))
