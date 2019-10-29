@@ -355,7 +355,7 @@ summary(M7)
 
 #### 2.3.4 Final Fitted Model
 ```{r}
-relbmi <- function(fit,...){
+relweights <- function(fit,...){
   R <- cor(fit$model)
   nvar <- ncol(R)
   rxx <- R[2:nvar, 2:nvar]
@@ -381,7 +381,7 @@ relbmi <- function(fit,...){
            ...)
   return(import)
 }
-relbmi(bmi_step_back, col="blue")
+relweights(bmi_step_back, col="blue")
 ```
 
 Obviously, abdomen contributes the most in the relationship with body density.
