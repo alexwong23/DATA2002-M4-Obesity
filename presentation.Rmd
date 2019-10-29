@@ -33,6 +33,8 @@ library(sjPlot)
 library(kableExtra)
 library(pheatmap)
 library(jtools)
+library(partykit)
+library(rpart)
 ```
 .scroll-output[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
@@ -42,12 +44,13 @@ data = data %>%
          overweight = case_when(
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
-
+data$overweight = as.numeric(data$overweight)
 colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
-#colnames(data_density)
+data_overweight = data[-c(4:5,17)]
+
 glimpse(data)
 ```
 ]
@@ -59,7 +62,7 @@ Due to the increasing consumptions of fast food and the increasing convenience o
 ---
 ## 2.1 Body Fat Percentage
 .pull-left[
-###2.1.1 Data Visualisation
+### 2.1.1 Data Visualisation
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 qtlcharts::iplotCorr(data_bf)
 ```
@@ -108,3 +111,55 @@ plot(bf_step_back,which=1:2) + theme_bw()
 ---
 ## 2.1.4 Final fitted model
 $$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest+1.01805abdomen$$ $$-0.28758hip + 0.26bicep -1.55084wrist$$
+---
+## 2.4 Predicting if a person is Overweight
+.pull-left[
+### 2.4.1 Logistical Regression
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+glm13 = glm(overweight ~ chest + abdomen + bicep, data = data_overweight)
+summ(glm13)
+```
+]
+##### Fitted Model (log-odds scale):
+$$logit(p)=log(\frac{p}{1-p})=-3.845275+0.013281Chest $$
+$$+0.020164Abdomen+0.035618Bicep$$
+]
+--
+.pull-right[
+### 2.4.2 Visualise Coefficients
+.scroll-box-20[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+plot_model(glm13, type = "pred", terms = c("abdomen", "chest", "bicep"), show.data = TRUE) +
+  theme_bw(base_size = 20)
+```
+]
+]
+---
+## 2.4 Predicting if a person is Overweight
+.pull-left[
+### 2.4.3 Resubstitution Error Rate
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE}
+glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
+data = data %>%
+  mutate(pred_prob = predict(glm0, type = "response"),
+         pred_surv = round(pred_prob))
+mean(data$overweight == data$pred_surv)
+```
+]
+Our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is **8.8%**.
+]
+--
+.pull-right[
+### 2.4.4 Decision Tree
+.scroll-box-20[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+data_overweight$overweight=as.character(data_overweight$overweight)
+
+ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.008))
+ov_tree
+plot(as.party(ov_tree))
+```
+]
+]
