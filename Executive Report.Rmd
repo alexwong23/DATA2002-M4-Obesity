@@ -1,0 +1,251 @@
+---
+title: Predicting Obesity Using DASL Dataset
+
+# Use letters for affiliations
+author:
+  - name: 460352996
+  - name: 470066919
+  - name: 480145820
+  - name: 480407614
+    
+    
+# Optional: line of arbitrary text with additional information.
+# Could be used, for example, to mention the bibliographic info in a post-print.
+# If not specified, defaults to "This version was compiled on \today"
+#date_subtitle: Published in *Journal of Statistical Software*, 2018
+
+# For footer text  TODO(fold into template, allow free form two-authors)
+lead_author_surname: Author and Author
+
+
+# Abstract
+abstract: |
+  Excess weight, especially obesity, has become an epidemic in the 21st century. This study aims to investigate an alternative method to determine "overweight" individuals oppose to body fat percentage. Two alternative methods are considered - BMI and body density. The results showed that BMI can be explained the best using simple body measurement and the measurement on abdomen is the most important predictor in estimating all three methods. A simpler predictive model for obesity has been developed using measurements on chest, abdomen and bicep. Limitations and implications are discussed.
+
+
+# Optional: Acknowledgements
+acknowledgements: |
+  This template package builds upon, and extends, the work of the excellent
+  [rticles](https://cran.r-project.org/package=rticles) package, and both packages rely on the
+  [PNAS LaTeX](http://www.pnas.org/site/authors/latex.xhtml) macros. Both these sources are
+  gratefully acknowledged as this work would not have been possible without them.  Our extensions
+  are under the same respective licensing term
+  ([GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html) and
+  [LPPL (>= 1.3)](https://www.latex-project.org/lppl/)).
+
+# Optional: One or more keywords
+keywords:
+  - Obesity
+  - Regression
+  - Correlation
+  - Prediction
+
+# Paper size for the document, values of letter and a4
+papersize: a4
+
+# Font size of the document, values of 9pt (default), 10pt, 11pt and 12pt
+fontsize: 9pt
+
+# Optional: Force one-column layout, default is two-column
+#one_column: true
+
+# Optional: Enables lineno mode, but only if one_column mode is also true
+#lineno: true
+
+# Optional: Enable one-sided layout, default is two-sided
+#one_sided: true
+
+# Optional: Enable section numbering, default is unnumbered
+#numbersections: true
+
+# Optional: Specify the depth of section number, default is 5
+#secnumdepth: 5
+
+# Optional: Skip inserting final break between acknowledgements, default is false
+skip_final_break: true
+
+# Optional: Bibliography 
+bibliography: pinp
+
+# Optional: Enable a 'Draft' watermark on the document
+#watermark: true
+
+# Customize footer, eg by referencing the vignette
+footer_contents: "A Research on Obesity"
+
+# Produce a pinp document
+output: pinp::pinp
+
+# Required: Vignette metadata for inclusion in a package.
+vignette: >
+  %\VignetteIndexEntry{YourPackage-vignetteentry}
+  %\VignetteKeywords{YourPackage, r, anotherkeyword}
+  %\VignettePackage{YourPackage}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+```{r load_packages, include=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(janitor)
+library("readxl")
+library(ggfortify)
+library(GGally)
+library(qtlcharts)
+library(leaps)
+library(sjPlot)
+library(pheatmap)
+library(partykit)
+library(rpart)
+library(caret)
+```
+
+```{r import_data, message=FALSE, warning=FALSE}
+data = read.delim("bodyfat.txt") %>% janitor::clean_names()
+data = data %>%
+  mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
+         overweight = case_when(
+          bmi >= 25 ~ 1,
+          bmi < 25 ~ 0))
+data$overweight = as.numeric(data$overweight)
+#colnames(data)
+data_bmi = data[-c(1:2,4:5,18)]
+data_bf = data[-c(1,3:5,17:18)]
+data_density = data[-c(2:5,17:18)]
+data_overweight = data[-c(4:5,17)]
+```
+
+## Introduction 
+Excess weight is the new epidemic of the 21st century and has resulted in many significant health and economic consequences for the global population (Stein and Colditz, 2004). In Australia, the obesity epidemic has spread drastically as 2 in 3 adults are classified as overweight or obese (Australian Institute of Health and Welfare, 2019). Researches has shown that this epidemic is more common in males than females and hence, BYU Human Performance Research Center has collected data from 250 men of various age and obtained estimates of the percentage of body fat through underwater weighing and various body circumference measurements (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is difficult to calculate in real life, the value for body fat percentage was derived from body density using the Siri’s 1956 equation.
+
+
+## Sampling Method
+Few details were provided with regards to the sampling method. However, from looking at the dataset, there is a gender bias as the epidemic question is one related to both genders, yet only male were involved in the sample. This suggests that any analysis based on this dataset cannot be applied to the whole population but only the male population.
+
+## Analysis Approach
+
+Step 1: determine how much variation in body fat percentage can be explained by simply body measurements and the number of measurements that is significant in building an accurate prediction model to examine the ease of calculation.
+
+Step 2: conduct similar analysis  on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements.
+
+Step 3: a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using  BMI as the guiding criteria. A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obesed.
+
+
+
+## References 
+
+Here we differ from PNAS and suggest natbib. References will appear in
+author-year form. Use `\citet{}`, `\citep{}`, etc as usual.
+
+We default to the `jss.bst` style. To switch to a different bibliography
+style, please use `biblio-style: style` in the YAML header.
+
+
+## Inline R Code 
+
+The PNAS sample included a fixed PNG image here, but this document prefers
+to show the results and embedding of _R_ code. 
+
+```{r figex, fig.width=3, fig.height=3, cache=TRUE, echo=FALSE, fig.cap=""}
+library(ggplot2)
+data$overweight = as.character(data$overweight)
+ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
+data$overweight = as.numeric(data$overweight)
+```
+
+Here we use a standard knitr bloc with explicit options for
+
+- figure width and height (`fig.width`, `fig.height`), both set to three inches;
+- whether the code is shown (`echo=TRUE`); and
+- the caption (`fig.cap`) as shown above.
+
+
+## Digital Figures 
+
+Markdown, Pandoc and LaTeX support `.eps` and `.pdf` files.
+
+Figures and Tables should be labelled and referenced in the standard way
+using the `\label{}` and `\ref{}` commands.
+
+The R examples above show how to insert a column-wide
+figure. To insert a figure wider than one column, please use the
+`\begin{figure*}...\end{figure*}` environment. 
+
+One (roundabout) way of doing this is to _not_ actually plot a figure, but to
+save it in a file as the following segment shows:
+
+```{r densityPlot, echo=TRUE}
+library(ggplot2)
+p <- ggplot(data = midwest,
+            mapping = aes(x = area,
+                          fill = state,
+                          color = state)) +
+    geom_density(alpha = 0.3)
+## save to file
+suppressMessages(ggsave("densities.pdf", p))
+```
+
+This file is then included via standard LaTeX commands.
+
+\begin{figure*}
+  \begin{center}
+    \includegraphics[width=0.66\textwidth, height=3.5in]{densities} 
+  \end{center}
+  \caption{Wide ggplot2 figure}\label{fig}
+\end{figure*}
+
+
+## Typeset Code (But Do Not Run It) 
+
+We can also just show code.
+
+```r
+xx <- faithful[,"eruptions"]
+fit <- density(xx)
+plot(fit)
+```
+
+This simply used a pandoc bloc started and ended by three backticks,
+with `r` as the language choice.  Similarly, _many_ other languages
+can be typeset directly simply by relying on pandoc.
+
+
+## Single column equations 
+
+Authors may use 1- or 2-column equations in their article, according to
+their preference.
+
+To allow an equation to span both columns, options are to use the
+`\begin{figure*}...\end{figure*}` environment mentioned above for
+figures. The `\begin{widetext}...\end{widetext}` environment as shown
+in equation \ref{eqn:example} below is deprecated, but \LaTeX commands
+`\onecolumn` and `\twocolumn` work fine.
+
+Please note that this option may run into problems with floats and
+footnotes, as mentioned in the [cuted package
+documentation](http://texdoc.net/pkg/cuted). In the case of problems
+with footnotes, it may be possible to correct the situation using
+commands `\footnotemark` and `\footnotetext`.
+
+\begin{equation}
+  \begin{aligned}
+(x+y)^3&=(x+y)(x+y)^2\\
+       &=(x+y)(x^2+2xy+y^2) \\
+       &=x^3+3x^2y+3xy^3+x^3. 
+       \label{eqn:example} 
+  \end{aligned}
+\end{equation}
+
+
+<!-- pandoc writes all tables using longtable, which fails in 2-column mode
+
+  Species                    CBS     CV     G3
+  ----------------------- ------ ------ ------
+  1\. Acetaldehyde           0.0    0.0    0.0
+  2\. Vinyl alcohol          9.1    9.6   13.5
+  3\. Hydroxyethylidene     50.8   51.2   54.0
+
+  : Comparison of the fitted potential energy surfaces and ab initio
+  benchmark electronic energy calculations
+
+-->
+
