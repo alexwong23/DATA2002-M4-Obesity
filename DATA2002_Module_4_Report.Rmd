@@ -85,6 +85,9 @@ Then similar analysis will be conducted on BMI and Body Density where the end re
 
 Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using body-fat percentage as the guiding criteria. A logistic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
 
+### changes by Katherine
+significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obesed.
+
 ***
 ## 2. Analysis
 Due to the increasing consumptions of fast food and the elevated convenience of food deliveries, concerns of obesity has risen throughout the world and has reached a new high. This has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many have switched to Body Mass Index (BMI) for its simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density.
@@ -203,7 +206,8 @@ summary(bmi_step_back)
 
 Based on the backward selection model, the fitted model has become:
 
-$$ \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
+$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip$$
+$$+ 0.150Thigh - 0.23Knee + 0.115Forearm $$
 
 #### 2.2.3 Check Assumptions
 ```{r message=FALSE}
@@ -264,7 +268,8 @@ relbmi(bmi_step_back, col="blue")
 
 The final model is:
 
-$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
+$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip$$
+$$+ 0.150Thigh - 0.23Knee + 0.115Forearm$$
 and both chest and abdomen are relatively more important in predicting BMI.
 
 Looking at the $R^2$ value (multiple R-squared) from the summary output, 90.2% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
@@ -516,11 +521,15 @@ Out of a total of 250 observations, **96%** of people with a chest circumference
 
 ## 3. Limitations
 <ol>
-<li>Gender Bias</li>
 <li>Privacy Issues</li>
 <li>Age Range</li>
-<li></li>
+```{r}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+<li>Multicollilinearity</li>
 </ol>
+
 ## 4. Conclusion
 
 ## 5. References
