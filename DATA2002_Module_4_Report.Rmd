@@ -83,14 +83,14 @@ The analysis will first begin through determining how much variation in body fat
 
 Then similar analysis will be conducted on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements and offers easier and simpler interpretation.
 
-Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using body-fat percentage as the guiding criteria. A logistic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
+Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using body-fat percentage as the guiding criteria. A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obesed.
 
 ***
 ## 2. Analysis
 Due to the increasing consumptions of fast food and the elevated convenience of food deliveries, concerns of obesity has risen throughout the world and has reached a new high. This has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many have switched to Body Mass Index (BMI) for its simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density.
 
-## 2.1 Body Fat Percentage
-##### 2.1.1 Data Visualisation
+### 2.1 Body Fat Percentage
+#### 2.1.1 Data Visualisation
 ```{r message=FALSE, warning=FALSE}
 qtlcharts::iplotCorr(data_bf)
 ```
@@ -203,7 +203,8 @@ summary(bmi_step_back)
 
 Based on the backward selection model, the fitted model has become:
 
-$$ \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
+$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip$$
+$$+ 0.150Thigh - 0.23Knee + 0.115Forearm $$
 
 #### 2.2.3 Check Assumptions
 ```{r message=FALSE}
@@ -264,7 +265,8 @@ relbmi(bmi_step_back, col="blue")
 
 The final model is:
 
-$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
+$$\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip$$
+$$+ 0.150Thigh - 0.23Knee + 0.115Forearm$$
 and both chest and abdomen are relatively more important in predicting BMI.
 
 Looking at the $R^2$ value (multiple R-squared) from the summary output, 90.2% of the variability of density is explained by the regression on percentage of Height, Neck, Chest, Abdomen.
@@ -284,10 +286,6 @@ $$
 Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
-```{r}
-#data1<-data_density[,-2]
-```
-
 
 ```{r}
 cor_matrix <- cor(data_density)
@@ -409,11 +407,12 @@ autoplot(M7,which=1:2)+theme_bw()
 ```
 
 ***
-#### 2.4 Which variables can best predict whether a person is overweight?
+### 2.4 Predicting Overweight
+#### Which variables can best predict whether a person is overweight?
 
 Since the variable 'Overweight' is dichotomous (binary), we perform a logistical regression to interpret the relationship between overweight and other significant variables.
 
-##### 2.4.1 Checking for Significance in a Logistic Regression
+#### 2.4.1 Checking for Significance in a Logistic Regression
 ```{r}
 data_overweight = data[-c(4:5,17)]
 data_overweight$overweight = as.numeric(data_overweight$overweight)
@@ -457,7 +456,7 @@ summary(glm12)
 ```
 Before we start making predictions with the model, we drop the variables which are not a significant predictor for being overweight. The fitted model is shown below.
 
-##### 2.4.2 Fitted Model (log odds scale)
+#### 2.4.2 Fitted Model (log odds scale)
 $$
 logit(p) = log(\frac{p}{1-p})  = -75.89380 + 0.37854Chest\\
 + 0.27128Abdomen + 0.22381Thigh\\
@@ -465,7 +464,7 @@ $$
 where the logit(p) is a special link from our linear combination of predictors to the probability of the outcome being equal to 1, and the coefficients are interpreted as changes in log-odds.
 
 
-##### 2.4.3 Visualising Coefficients (odds scale) and Predictions
+#### 2.4.3 Visualising Coefficients (odds scale) and Predictions
 ```{r message=FALSE, warning=FALSE}
 summary(glm12)
 #tab_model(glm0, transform = NULL)
@@ -477,7 +476,12 @@ In the Coefficient graph, the three significant variables have similar odd ratio
 
 From the Prediction graph, the positive slopes indicate a larger abdomen circumference leads to a high probability of being overweight.
 Comparing the three individual graphs, the steeper slope indicates bicep circumference correlates with odds of being overweight.
+<<<<<<< HEAD
 ##### 2.4.4 Evaluating (in-sample) performance
+=======
+
+#### 2.4.4 Evaluating (in-sample) performance
+>>>>>>> eb02b408c5725340d071ce95dd26aa0caf0a559a
 We correctly classified 92% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.0%.
 ```{r}
 glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
@@ -514,7 +518,7 @@ predict(glm12, newdata = predict_overweight, type = "link")
 ```
 
 
-##### 2.4.5 Decision Tree
+#### 2.4.5 Decision Tree
 ```{r}
 data$overweight=as.character(data$overweight)
 ov_tree = rpart(overweight ~ abdomen + chest + thigh, data = data, method = "class",control = rpart.control(cp = 0.008))
@@ -525,30 +529,31 @@ plot(as.party(ov_tree))
 Out of a total of 250 observations, **96%** of people with a chest circumference greater or equal to 101.55cm are overweight. Also, of the people with a chest circumference less than 101.55cm, those with an abdomen circumference greater or equal to 92.6cm are **72%** likely to be overweight. On the other hand, those with an abdomen circumference less than 92.6cm are **92%** likely to be NOT overweight.
 
 
-#### 2.5.1 Interpretation
-
-
 ## 3. Limitations
 <ol>
 <li>Privacy Issues</li>
 <li>Age Range</li>
+<<<<<<< HEAD
 
+=======
+>>>>>>> eb02b408c5725340d071ce95dd26aa0caf0a559a
 ```{r}
 hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
 curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
 ```
 <li>Multicollilinearity</li>
 </ol>
+
 ## 4. Conclusion
 
 ## 5. References
 <ol>
 <li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
 
-</li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+<li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
 
-</li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+<li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
 
-</li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
 </ol> 
 
