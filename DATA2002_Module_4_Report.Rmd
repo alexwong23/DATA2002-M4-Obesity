@@ -20,6 +20,8 @@ library(qtlcharts)
 library(leaps)
 library(sjPlot)
 library(pheatmap)
+library(partykit)
+library(rpart)
 ```
 
 ***
@@ -41,7 +43,7 @@ data = data %>%
          overweight = case_when(
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
-data$overweight = as.character(data$overweight)
+data$overweight = as.numeric(data$overweight)
 #colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
@@ -358,7 +360,7 @@ summary(M7)
 
 #### 2.3.4 Final Fitted Model
 ```{r}
-relbmi <- function(fit,...){
+relweights <- function(fit,...){
   R <- cor(fit$model)
   nvar <- ncol(R)
   rxx <- R[2:nvar, 2:nvar]
@@ -384,7 +386,7 @@ relbmi <- function(fit,...){
            ...)
   return(import)
 }
-relbmi(bmi_step_back, col="blue")
+relweights(bmi_step_back, col="blue")
 ```
 
 Obviously, abdomen contributes the most in the relationship with body density.
@@ -410,7 +412,7 @@ autoplot(M7,which=1:2)+theme_bw()
 ***
 #### 2.4 Which variables can best predict whether a person is overweight?
 
-Since overweight is a binary field.. logistical regression....
+Since the variable 'Overweight' is dichotomous (binary), we perform a logistical regression to interpret the relationship between overweight and other significant variables.
 
 ##### 2.4.1 Checking for Significance in a Logistic Regression
 ```{r,warning=FALSE}
@@ -475,13 +477,6 @@ data = data %>%
   mutate(pred_prob = predict(glm0, type = "response"),
          pred_surv = round(pred_prob))
 mean(data$overweight == data$pred_surv)
-
-# not working
-#library(caret)
-#confusion.glm = confusionMatrix(
-#  data = as.factor(data$pred_surv), 
-#  reference = as.factor(data$overweight))
-#confusion.glm$table
 ```
 
 **The odds of being overweight for someone with an above average abdomen circumference of 120 is 1.26.**
@@ -501,13 +496,25 @@ predict(glm13, newdata = predict_overweight, type = "link")
 ```
 
 
+##### 2.4.5 Decision Tree
+```{r}
+data_overweight$overweight=as.character(data_overweight$overweight)
+data$pred_surv= as.factor(data$pred_surv)
+data$overweight = as.factor(data$overweight)
+levels(data$overweight) <- c("1","2","3")
+library(caret)
+confusion.glm = confusionMatrix(data = data$pred_surv, reference = data$overweight)
+confusion.glm$table
+```
 
-##### DECISION TREE NOT WORKING delete??
-
+<<<<<<< HEAD
 ```{r message=FALSE}
 library(partykit)
 library(rpart)
 data_overweight$overweight=as.character(data_overweight$overweight)
+=======
+```{r}
+>>>>>>> 3b77f7033bba3b3a34a01a68e0cb0ab306ff7419
 ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.009))
 ov_tree
 plot(as.party(ov_tree))
