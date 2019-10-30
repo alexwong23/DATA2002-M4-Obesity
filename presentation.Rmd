@@ -56,9 +56,6 @@ library(rpart)
 library(caret)
 ```
 
-background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
-background-size: 45%
-background-position: 95% 40%
 
 ## 1. Introduction to our data
 .pull-left[
@@ -81,10 +78,17 @@ glimpse(data)
 ```
 ]
 ]
-
+.pull-right[
+```{r message=FALSE, warning=FALSE,echo=FALSE}
+data$overweight = as.character(data$overweight)
+ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
+data$overweight = as.numeric(data$overweight)
+```
+]
 ---
-
-
+background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
+background-size: 60%
+---
 ## 2. Analysis
 .pull-left[
 
