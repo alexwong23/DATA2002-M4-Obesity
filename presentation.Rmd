@@ -19,7 +19,19 @@ output:
       navigation:
         scroll: false # disable slide transitions by scrolling
 ---
-## 1. Introduction to our data
+background-image: url(http://thehappymiddle.com/wp-content/uploads/2018/05/bigBoned_HappyMiddleCopyrightBrianandRoseColes2018.png)
+background-size: 50%
+background-position: 90% 10%
+.pull-left[
+## Table of Contents
+<ol>
+<li>Introduction</li>
+<li>Analysis</li>
+<li>Limitations</li>
+<li>Conclusion</li>
+</ol>
+]
+---
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 library(tidyverse)
 library(knitr)
@@ -37,7 +49,14 @@ library(partykit)
 library(rpart)
 library(caret)
 ```
-.scroll-output[
+
+background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
+background-size: 45%
+background-position: 95% 40%
+
+## 1. Introduction to our data
+.pull-left[
+.scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
@@ -55,64 +74,194 @@ data_overweight = data[-c(4:5,17)]
 glimpse(data)
 ```
 ]
+]
 
 ---
-## 2. Analysis
-### Prediction for Obesity
-Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at comparing the results from predicting body fat percentage using other body measurements and  predicting BMI using other body measurements to determine wh body measurement is the most important in determining obesity.
+
+background-image: url(assets/newintro1.png)
+background-size: 60%
+background-position: 50% 50%
+
+--
+
+background-image: url(assets/newintro2.png)
+background-size: 60%
+
 ---
-## 2.1 Body Fat Percentage
+
+## 2. Analysis
 .pull-left[
-### 2.1.1 Data Visualisation
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
-qtlcharts::iplotCorr(data_bf)
+
+```{r message=FALSE, echo=FALSE}
+cor_matrix <- cor(data)
+pheatmap(cor_matrix, display_numbers = T,na.rm=T)
+```
+]
+
+--
+
+.pull-right[
+```{r,message=FALSE, warning=FALSE, echo=FALSE}
+qtlcharts::iplotCorr(data)
 ```
 
 Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
 ]
---
-.pull-right[
-###2.1.2 Multiple Regression
-.scroll-box-10[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
-bf_lm = lm(pct_bf~.,data=data_bf)
-summ(bf_lm)
-```
-]
-Using the individual p-value method, the varaibles that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
-]
+
 ---
-## 2.1 Body Fat Percentage
-.pull-left[
-### 2.1.3 backward selection model
+
+## 2.1 Selection Model
+.pull-left-3[
 .scroll-box-10[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
+### BodyFat
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+bf_lm = lm(pct_bf~.,data=data_bf)
 bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
 summ(bf_step_back)
 ```
 ]
-Based on the backward selection model, the fitted model has become:
+##### Fitted Model:
+$$\hat{BodyFat} = 1.52 - 0.396Neck$$
+$$ - 0.128Chest $$
+$$+ 1.018Abdomen - 0.287Hip$$
+$$+ 0.26Bicep - 1.55Wrist$$
+]
 
+<<<<<<< HEAD
 $$\hat{body-fat} = 1.52 -0.396neck - 0.128chest $$ $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
+=======
+--
+
+.pull-left-3[
+.scroll-box-10[
+### BMI
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+bmi_lm = lm(bmi~.,data=data_bmi)
+bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
+summ(bmi_step_back)
+```
+]
+##### Fitted Model:
+$$\hat{BMI} = -10.94 + 0.161Chest$$
+$$+ 0.127Abdomen + 0.050Hip$$
+$$+ 0.150Thigh - 0.23Knee $$
+$$+ 0.115Forearm $$
+>>>>>>> cad1082e3110f78e4051946853c8299ee03b7c49
 ]
 
 --
 
-.pull-right[
-### 2.1.4 Check Assumptions
-Finally, to check assumption, we perform the ggfortify function.
+.pull-left-3[
 .scroll-box-10[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
+### Density
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+density_lm = lm(density~.,data=data_density)
+density_step_back = step(density_lm, direction = "backward",trace = FALSE)
+summ(density_step_back)
+```
+]
+##### Fitted Model:
+$$\hat{Body Density} = 1.1104052 $$
+$$+ 0.0019085Neck$$
+$$- 0.0022064Abdomen$$
+$$ + 0.0011314Hip - 0.0006094Thigh$$
+]
+---
+
+
+## 2.2 Check Assumptions
+.pull-left-3[
+### BodyFat
+.scroll-box-30[
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
 par(mfrow=c(1,2))
 plot(bf_step_back,which=1:2) + theme_bw()
 ```
 ]
-######The QQ plot shows a straight line which indicates that the normality assumption is reasonable. However, the residuals vs fitted plot shows a slight variation; but given that body fat is hard to predict, this is acceptable.
+]
+
+--
+
+.pull-left-3[
+### BMI
+.scroll-box-30[
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
+par(mfrow=c(1,2))
+plot(bmi_step_back,which=1:2) + theme_bw()
+```
+]
+]
+
+--
+
+.pull-left-3[
+### Density
+.scroll-box-30[
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
+par(mfrow=c(1,2))
+plot(density_step_back,which=1:2) + theme_bw()
+```
+]
 ]
 ---
-## 2.1.4 Final fitted model
-$$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest+1.01805abdomen$$ $$-0.28758hip + 0.26bicep -1.55084wrist$$
+
+## 2. Relative Importance of Predictor Variables
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+par(mfrow=c(1,3))
+relweights <- function(fit,...){
+  R <- cor(fit$model)
+  nvar <- ncol(R)
+  rxx <- R[2:nvar, 2:nvar]
+  rxy <- R[2:nvar, 1]
+  svd <- eigen(rxx)
+  evec <- svd$vectors
+  ev <- svd$values
+  delta <- diag(sqrt(ev))
+  lambda <- evec %*% delta %*% t(evec)
+  lambdasq <- lambda ^ 2
+  beta <- solve(lambda) %*% rxy
+  rsquare <- colSums(beta ^ 2)
+  rawwgt <- lambdasq %*% beta ^ 2
+  import <- (rawwgt / rsquare) * 100
+  import <- as.data.frame(import)
+  row.names(import) <- names(fit$model[2:nvar])
+  names(import) <- "Weights"
+  import <- import[order(import),1, drop=FALSE]
+  dotchart(import$Weights, labels=row.names(import),
+           xlab="% of R-Square", pch=19,
+           sub=paste("Total R-Square=", round(rsquare, digits=3)),
+           ...)
+}
+```
+.pull-left-3[
+### BodyFat
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+relweights(bf_step_back, col="blue")
+```
+]
+
+--
+
+.pull-left-3[
+### BMI
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+relweights(bmi_step_back, col="blue")
+```
+]
+
+--
+
+.pull-left-3[
+### Density
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+M7<- lm(formula = density ~ neck + abdomen + hip + thigh , 
+    data = data_density)
+relweights(M7, col="blue")
+```
+]
+
 ---
+
 ## 2.4 Predicting if a person is Overweight
 .pull-left[
 ### 2.4.1 Logistical Regression
@@ -166,4 +315,58 @@ ov_tree
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 plot(as.party(ov_tree))
 ```
+
 ]
+---
+## 3. Limitations
+
+--
+background-image: url(http://d3thpuk46eyjbu.cloudfront.net/uploads/production/10575/1549935738/original/C8qr_qZUIAATGnd.jpg)
+background-size: 30%
+background-position: 5% 60%
+.pull-left-3[
+- ###Gender Bias
+]
+
+--
+
+.pull-left-3[
+- ###Age Range
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+]
+
+--
+
+.pull-left-3[
+- ###Multicollinearity
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+ggplot(data, aes(x = abdomen, y = waist)) + 
+  geom_point() + theme_classic(base_size = 26) + 
+  labs(x = "abdomen", y = "waist") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+]
+
+---
+## 4. Conclusion
+
+--
+background-image: url(https://i.pinimg.com/564x/6c/6b/15/6c6b154209c2a3cb1932f7138acef05e.jpg)
+background-size: 40%
+background-position: 50% 50%
+
+---
+### References
+
+<ol>
+<li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
+
+<li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+
+<li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+</ol>

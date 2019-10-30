@@ -287,10 +287,6 @@ $$
 Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
-```{r}
-#data1<-data_density[,-2]
-```
-
 
 ```{r}
 cor_matrix <- cor(data_density)
@@ -434,6 +430,20 @@ glm6 = glm(overweight ~ pct_bf + neck + chest + abdomen + hip + thigh + bicep + 
 ```
 
 ```{r}
+data_overweight = data[-c(4:5,17)]
+data_overweight$overweight = as.numeric(data_overweight$overweight)
+glm1 = glm(overweight ~ ., data = data_overweight)
+# drop knee
+glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + ankle + bicep + forearm + wrist, data = data_overweight)
+# drop ankle
+glm3 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
+# drop density
+glm4 = glm(overweight ~ pct_bf + age + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
+# drop age
+glm5 = glm(overweight ~ pct_bf + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
+# drop waist
+glm6 = glm(overweight ~ pct_bf + neck + chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
+
 glm1 = glm(overweight ~ ., family = binomial, data = data_overweight)
 # drop hip
 glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + knee + thigh + ankle + bicep + forearm + wrist, family = binomial, data = data_overweight)
@@ -555,7 +565,16 @@ Out of a total of 250 observations, **96%** of people with a chest circumference
 <li>Gender Bias</li>
 <li>Privacy Issues</li>
 <li>Age Range</li>
+<<<<<<< HEAD
 <li></li>
+=======
+
+```{r}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+<li>Multicollilinearity</li>
+>>>>>>> cad1082e3110f78e4051946853c8299ee03b7c49
 </ol>
 ## 4. Conclusion
 
