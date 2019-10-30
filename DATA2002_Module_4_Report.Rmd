@@ -81,7 +81,7 @@ The analysis will first begin through determining how much variation in body fat
 
 Then similar analysis will be conducted on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements and offers easier and simpler interpretation.
 
-Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (Yes) and non-overweight individuals (No) using body-fat percentage as the guiding criteria. A logstic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
+Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using body-fat percentage as the guiding criteria. A logistic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
 
 ***
 ## 2. Analysis
