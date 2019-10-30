@@ -30,11 +30,9 @@ background-position: 90% 10%
 <li>Analysis</li>
 <li>Limitations</li>
 <li>Conclusion</li>
-<li>References</li>
 </ol>
 ]
 ---
-## 1. Introduction to our data
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 library(tidyverse)
 library(knitr)
@@ -52,7 +50,15 @@ library(partykit)
 library(rpart)
 library(caret)
 ```
-.scroll-output[
+
+class: middle, bottom
+background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
+background-size: 45%
+background-position: 95% 40%
+
+## 1. Introduction to our data
+.pull-left[
+.scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
@@ -70,6 +76,18 @@ data_overweight = data[-c(4:5,17)]
 glimpse(data)
 ```
 ]
+]
+
+---
+
+class: middle, bottom
+background-image: url(assets/intro1.png)
+background-size: 60%
+background-position: 50% 50%
+
+--
+
+background-image: url(assets/intro2.png)
 
 ---
 
@@ -295,4 +313,37 @@ ov_tree
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 plot(as.party(ov_tree))
 ```
+
 ]
+---
+
+## 3. Limitations
+
+--
+.pull-left-3[
+###Gender Bias
+Story:
+**Measurements of 250 men of various ages.** The percent of a man’s body that is fat is a matter of concern for health and fitness. But the %bodyfat is difficult and expensive to measure accurately. These data offer correct %bodyfat measurements along with a variety of easier to find measures. Can you build a model to predict the %bodyfat from other, more easily made, measurements?
+]
+--
+.pull-left-3[
+###Age Range
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+]
+--
+
+.pull-left-3[
+###Multicollinearity
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+ggplot(data, aes(x = abdomen, y = waist)) + 
+  geom_point() + theme_classic(base_size = 26) + 
+  labs(x = "abdomen", y = "waist") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+]
+
+---
+## 4. Conclusion
