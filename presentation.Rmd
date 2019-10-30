@@ -75,6 +75,7 @@ glimpse(data)
 
 ## 2. Analysis
 .pull-left[
+
 ```{r message=FALSE, echo=FALSE}
 cor_matrix <- cor(data)
 pheatmap(cor_matrix, display_numbers = T,na.rm=T)
@@ -87,6 +88,7 @@ pheatmap(cor_matrix, display_numbers = T,na.rm=T)
 ```{r,message=FALSE, warning=FALSE, echo=FALSE}
 qtlcharts::iplotCorr(data)
 ```
+
 Based on the interactive correlation matrix, it can be seen the level of correlation differs quite drastically between the variables and the backward variable selection method is adopted.
 ]
 
