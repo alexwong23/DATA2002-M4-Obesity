@@ -19,7 +19,6 @@ output:
       navigation:
         scroll: false # disable slide transitions by scrolling
 ---
-class: middle, bottom
 background-image: url(http://thehappymiddle.com/wp-content/uploads/2018/05/bigBoned_HappyMiddleCopyrightBrianandRoseColes2018.png)
 background-size: 50%
 background-position: 90% 10%
@@ -73,14 +72,12 @@ glimpse(data)
 ]
 ]
 --
-class: middle, bottom
 background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
 background-size: 45%
 background-position: 90% 20%
 
 ---
 
-class: middle, bottom
 background-image: url(assets/intro1.png)
 background-size: 60%
 background-position: 50% 50%
@@ -302,27 +299,30 @@ plot(as.party(ov_tree))
 
 ]
 ---
-
 ## 3. Limitations
 
 --
+background-image: url(http://d3thpuk46eyjbu.cloudfront.net/uploads/production/10575/1549935738/original/C8qr_qZUIAATGnd.jpg)
+background-size: 30%
+background-position: 5% 60%
 .pull-left-3[
-###Gender Bias
-Story:
-**Measurements of 250 men of various ages.** The percent of a man’s body that is fat is a matter of concern for health and fitness. But the %bodyfat is difficult and expensive to measure accurately. These data offer correct %bodyfat measurements along with a variety of easier to find measures. Can you build a model to predict the %bodyfat from other, more easily made, measurements?
+- ###Gender Bias
 ]
+
 --
+
 .pull-left-3[
-###Age Range
+- ###Age Range
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
 curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
 ```
 ]
+
 --
 
 .pull-left-3[
-###Multicollinearity
+- ###Multicollinearity
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 ggplot(data, aes(x = abdomen, y = waist)) + 
   geom_point() + theme_classic(base_size = 26) + 
@@ -333,3 +333,4 @@ ggplot(data, aes(x = abdomen, y = waist)) +
 
 ---
 ## 4. Conclusion
+
