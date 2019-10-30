@@ -381,7 +381,7 @@ relweights <- function(fit,...){
            ...)
   return(import)
 }
-relweights(bmi_step_back, col="blue")
+relweights(M7, col="blue")
 ```
 
 Obviously, abdomen contributes the most in the relationship with body density.
@@ -412,6 +412,7 @@ Since overweight is a binary field.. logistical regression....
 ##### 2.4.1 Checking for Significance in a Logistic Regression
 ```{r}
 data_overweight = data[-c(4:5,17)]
+data_overweight$overweight = as.numeric(data_overweight$overweight)
 glm1 = glm(overweight ~ ., data = data_overweight)
 # drop knee
 glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + hip + thigh + ankle + bicep + forearm + wrist, data = data_overweight)
@@ -465,6 +466,7 @@ Comparing the three individual graphs, the slight difference in the slope's y ax
 ##### 2.4.4 Predictions
 We correctly classified 91.2% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.8%.
 ```{r}
+data$overweight = as.numeric(data$overweight)
 glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
 data = data %>% 
   mutate(pred_prob = predict(glm0, type = "response"),
@@ -512,10 +514,14 @@ plot(as.party(ov_tree))
 
 ## 3. Limitations
 <ol>
-<li>Gender Bias</li>
 <li>Privacy Issues</li>
 <li>Age Range</li>
-<li></li>
+
+```{r}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+<li>Multicollilinearity</li>
 </ol>
 ## 4. Conclusion
 
