@@ -30,11 +30,9 @@ background-position: 90% 10%
 <li>Analysis</li>
 <li>Limitations</li>
 <li>Conclusion</li>
-<li>References</li>
 </ol>
 ]
 ---
-## 1. Introduction to our data
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 library(tidyverse)
 library(knitr)
@@ -52,6 +50,9 @@ library(partykit)
 library(rpart)
 library(caret)
 ```
+
+## 1. Introduction to our data
+.pull-left[
 .scroll-output[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
@@ -70,6 +71,23 @@ data_overweight = data[-c(4:5,17)]
 glimpse(data)
 ```
 ]
+]
+--
+class: middle, bottom
+background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
+background-size: 45%
+background-position: 90% 20%
+
+---
+
+class: middle, bottom
+background-image: url(assets/intro1.png)
+background-size: 60%
+background-position: 50% 50%
+
+--
+
+background-image: url(assets/intro2.png)
 
 ---
 
@@ -281,4 +299,10 @@ ov_tree
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 plot(as.party(ov_tree))
 ```
+
 ]
+---
+## 3. Limitations
+
+---
+## 4. Conclusion
