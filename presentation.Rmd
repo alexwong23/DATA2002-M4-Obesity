@@ -33,6 +33,9 @@ library(sjPlot)
 library(kableExtra)
 library(pheatmap)
 library(jtools)
+library(partykit)
+library(rpart)
+library(caret)
 ```
 .scroll-output[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
@@ -42,12 +45,13 @@ data = data %>%
          overweight = case_when(
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
-
+data$overweight = as.numeric(data$overweight)
 colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
-#colnames(data_density)
+data_overweight = data[-c(4:5,17)]
+
 glimpse(data)
 ```
 ]
@@ -59,7 +63,7 @@ Due to the increasing consumptions of fast food and the increasing convenience o
 ---
 ## 2.1 Body Fat Percentage
 .pull-left[
-###2.1.1 Data Visualisation
+### 2.1.1 Data Visualisation
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 qtlcharts::iplotCorr(data_bf)
 ```
@@ -108,3 +112,58 @@ plot(bf_step_back,which=1:2) + theme_bw()
 ---
 ## 2.1.4 Final fitted model
 $$\hat{body_fat} = 1.52 -0.3965neck - 0.128chest+1.01805abdomen$$ $$-0.28758hip + 0.26bicep -1.55084wrist$$
+---
+## 2.4 Predicting if a person is Overweight
+.pull-left[
+### 2.4.1 Logistical Regression
+.scroll-box-10[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
+summ(glm12)
+```
+]
+##### Fitted Model (log-odds scale):
+$$logit(p)=log(\frac{p}{1-p})=-75.89380+0.37854Chest$$
+$$+0.27128Abdomen+0.22381Thigh$$
+]
+--
+.pull-right[
+### 2.4.2 Visualise Predictions
+.scroll-box-20[
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 20) + labs(caption='Source: SOCR Data')
+```
+]
+]
+---
+## 2.4 Predicting if a person is Overweight
+.pull-left[
+### 2.4.3 Prediction Accuracy
+```{r,message=FALSE, warning=FALSE, echo=FALSE}
+glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
+data = data %>% 
+  mutate(pred_prob = predict(glm0, type = "response"),
+         pred_surv = round(pred_prob))
+
+#1 - mean(data$overweight != data$pred_surv)
+confusion.glm = confusionMatrix(
+  data = as.factor(data$pred_surv),
+  reference = as.factor(data$overweight))
+confusion.glm$table
+```
+The accuracy of our predictions is **92%**.
+
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+data_overweight$overweight=as.character(data_overweight$overweight)
+
+ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.008))
+ov_tree
+```
+]
+--
+.pull-right[
+### 2.4.4 Decision Tree
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+plot(as.party(ov_tree))
+```
+]

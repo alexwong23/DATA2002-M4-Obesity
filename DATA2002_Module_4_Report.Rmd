@@ -20,6 +20,9 @@ library(qtlcharts)
 library(leaps)
 library(sjPlot)
 library(pheatmap)
+library(partykit)
+library(rpart)
+library(caret)
 ```
 
 ***
@@ -30,7 +33,7 @@ Excess weight, especially obesity, has become an epidemic in the 21st century an
 
 
 ### 1.1 Sampling method and potential biases
-There were not many information given with regards to the sampling method. However, from looking at the dataset, there is gender biase as the epidemic question is one related to both gender, yet only male were involved in the sample. This suggests that any analysis based on this dataset cannot be applied to the whole population but only the male population.
+Few details were provided with regards to the sampling method. However, from looking at the dataset, there is a gender bias as the epidemic question is one related to both genders, yet only male were involved in the sample. This suggests that any analysis based on this dataset cannot be applied to the whole population but only the male population.
 
 
 ### 1.2 Data import, processing and cleaning
@@ -41,22 +44,25 @@ data = data %>%
          overweight = case_when(
           bmi >= 25 ~ 1,
           bmi < 25 ~ 0))
-data$overweight = as.character(data$overweight)
+data$overweight = as.numeric(data$overweight)
 #colnames(data)
 data_bmi = data[-c(1:2,4:5,18)]
 data_bf = data[-c(1,3:5,17:18)]
 data_density = data[-c(2:5,17:18)]
-#glimpse(data)
+data_overweight = data[-c(4:5,17)]
+glimpse(data)
 ```
 
 ### 1.3 Data Visualisation
 
 #### 1.3.1 Obesity and Age
-```{r}
-ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severness of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Over-Weight", "Over-Weight"))
+```{r message=FALSE, warning=FALSE}
+data$overweight = as.character(data$overweight)
+ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
+data$overweight = as.numeric(data$overweight)
 ```
 
-From looking at the graph, it can be observed that most of the sample comes from the age group between 40-60 and the number of people who appear to be over-weight seems to be distributed evenly across the population.
+From looking at the graph, it can be observed that most of the sample comes from the age group between 40-60 and the number of people who appear to be overweight seems to be distributed evenly across the population.
 
 #### 1.3.2 Body Measurements
 
@@ -68,7 +74,7 @@ boxplot(data$hip,data$knee,data$thigh,data$ankle,main = "Lower Body Measurements
 From the two boxplots, the body measurement dataset appears relatively symmetrical and contains a few outliers. This may propose some problems in the later stages of the analysis.
 
 ### 1.4 Analysis Approach
-This report aims to determine an alternative method to determine "over-weight" individuals oppose to body fat percentage and the two alternative methods considered are:
+This report aims to determine an alternative method to determine "overweight" individuals oppose to body fat percentage and the two alternative methods considered are:
 
 1. BMI
 2. Body Density
@@ -77,15 +83,15 @@ The analysis will first begin through determining how much variation in body fat
 
 Then similar analysis will be conducted on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements and offers easier and simpler interpretation.
 
-Lastly, a binary indicator will be added to differentiate the sample into over-weight individuals (Yes) and non-over-weight individuals (No) using body-fat percentage as the guiding criteria. A logstic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
+Lastly, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using body-fat percentage as the guiding criteria. A logistic regression is run on the binary indicator with BMI, body density and age for a simpler model to determine the odds of an individual being obesed.
 
 ***
 ## 2. Analysis
-Due to the increasing consumptions of fast food and the increasing convenience of food deliveries, concerns about obesity level is rising throughput the world and has reached a new high. This increasing concern has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many has switched to Body Mass Index (BMI) for simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density.
+Due to the increasing consumptions of fast food and the elevated convenience of food deliveries, concerns of obesity has risen throughout the world and has reached a new high. This has lead to an increasing need to measure obesity accurately and percentage body fat is arguably the most accurate measure by far. However, the calculation of body fat is difficult and many have switched to Body Mass Index (BMI) for its simpler calculation. This section is looking at how much variation that simple body measurements can explain in the three methods of interest - body fat percentage, BMI and body density.
 
 ## 2.1 Body Fat Percentage
 ##### 2.1.1 Data Visualisation
-```{r}
+```{r message=FALSE, warning=FALSE}
 qtlcharts::iplotCorr(data_bf)
 ```
 
@@ -96,7 +102,7 @@ Based on the interactive correlation matrix above, it can be seen the level of c
 bf_lm = lm(pct_bf~.,data=data_bf)
 summary(bf_lm)
 ```
-Using the individual p-value method, the varaibles that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
+Using the individual p-value method, the variables that need to be dropped are chest, waist, thigh, knee,ankle, bicep, forearm with ankle being the first to drop down due to its high p-value. However, to double check, the AIC criterion will also be considered.
 
 ```{r}
 bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
@@ -104,11 +110,11 @@ summary(bf_step_back)
 ```
 Based on the backward selection model, the fitted model has become:
 
-$$ \hat{Body - Fat} = 1.52 -0.3965Neck - 0.128Chest + 1.01805Abdomen -0.28758Hip + 0.26Vicep -1.55084Wrist $$
+$$\hat{BodyFat} = 1.52 -0.3965Neck - 0.128Chest$$
+$$+ 1.01805Abdomen -0.28758Hip + 0.26Vicep -1.55084Wrist$$
 
 #### 2.1.3 Check Assumptions
-Finally, to check assumption, we perform the ggfortify function.
-```{r}
+```{r message=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 plot(bf_step_back,which=1:2) + theme_bw()
 ```
@@ -188,7 +194,7 @@ bmi_lm = lm(bmi~.,data=data_bmi)
 summary(bmi_lm)
 ```
 
-Using the individual p-value method, the varaibles that need to be dropped are hip, ankle, bicep, forearm and wrist. To double check, the AIC criterion will also be considered.
+Using the individual p-value method, the variables that need to be dropped are hip, ankle, bicep, forearm and wrist. To double check, the AIC criterion will also be considered.
 
 ```{r}
 bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
@@ -200,9 +206,7 @@ Based on the backward selection model, the fitted model has become:
 $$ \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip + 0.150 Thigh - 0.23Knee + 0.115Forearm $$
 
 #### 2.2.3 Check Assumptions
-Finally, to check assumption, we perform the ggfortify function.
-
-```{r}
+```{r message=FALSE}
 par(mfrow=c(1,2))
 plot(bmi_step_back,which=1:2) + theme_bw()
 ```
@@ -407,7 +411,7 @@ autoplot(M7,which=1:2)+theme_bw()
 ***
 #### 2.4 Which variables can best predict whether a person is overweight?
 
-Since overweight is a binary field.. logistical regression....
+Since the variable 'Overweight' is dichotomous (binary), we perform a logistical regression to interpret the relationship between overweight and other significant variables.
 
 ##### 2.4.1 Checking for Significance in a Logistic Regression
 ```{r}
@@ -424,90 +428,102 @@ glm4 = glm(overweight ~ pct_bf + age + neck + chest + abdomen + waist + hip + th
 glm5 = glm(overweight ~ pct_bf + neck + chest + abdomen + waist + hip + thigh + bicep + forearm + wrist, data = data_overweight)
 # drop waist
 glm6 = glm(overweight ~ pct_bf + neck + chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop neck
-glm7 = glm(overweight ~ pct_bf + chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop pct_bf
-glm8 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm + wrist, data = data_overweight)
-# drop waist
-glm9 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm, data = data_overweight)
-# drop wrist
-glm10 = glm(overweight ~ chest + abdomen + hip + thigh + bicep + forearm, data = data_overweight)
-# drop forearm
-glm11 = glm(overweight ~ chest + abdomen + hip + thigh + bicep, data = data_overweight)
-# drop thigh
-glm12 = glm(overweight ~ chest + abdomen + hip + bicep, data = data_overweight)
+
+glm1 = glm(overweight ~ ., family = binomial, data = data_overweight)
 # drop hip
-glm13 = glm(overweight ~ chest + abdomen + bicep, data = data_overweight)
-summary(glm13)
+glm2 = glm(overweight ~ density + pct_bf + age + neck + chest + abdomen + waist + knee + thigh + ankle + bicep + forearm + wrist, family = binomial, data = data_overweight)
+
+# drop neck
+glm3 = glm(overweight ~ density + pct_bf + age + chest + abdomen + waist + knee + thigh + ankle + bicep + forearm + wrist, family = binomial, data = data_overweight)
+# drop forearm
+glm4 = glm(overweight ~ density + pct_bf + age + chest + abdomen + waist + knee + thigh + ankle + bicep + wrist, family = binomial, data = data_overweight)
+# drop pct_bf
+glm5 = glm(overweight ~ density + age + chest + abdomen + waist + knee + thigh + ankle + bicep + wrist, family = binomial, data = data_overweight)
+# drop wrist
+glm6 = glm(overweight ~ density + age + chest + abdomen + waist + knee + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop age
+glm7 = glm(overweight ~ density + chest + abdomen + waist + knee + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop knee
+glm8 = glm(overweight ~ density + chest + abdomen + waist + thigh + ankle + bicep, family = binomial, data = data_overweight)
+# drop ankle
+glm9 = glm(overweight ~ density + chest + abdomen + waist + thigh + bicep, family = binomial, data = data_overweight)
+# drop waist
+glm10 = glm(overweight ~ density + chest + abdomen + thigh + bicep, family = binomial, data = data_overweight)
+# drop density
+glm11 = glm(overweight ~ chest + abdomen + thigh + bicep, family = binomial, data = data_overweight)
+# drop bicep
+glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
+summary(glm12)
 ```
 Before we start making predictions with the model, we drop the variables which are not a significant predictor for being overweight. The fitted model is shown below.
 
-##### 2.4.2 Fitted Model
+##### 2.4.2 Fitted Model (log odds scale)
 $$
-logit(p) = log(\frac{p}{1-p})  = -3.845275 + 0.013281 \times Chest\\
-+ 0.020164 \times Abdomen\ + 0.035618 \times bicep\\
+logit(p) = log(\frac{p}{1-p})  = -75.89380 + 0.37854Chest\\
++ 0.27128Abdomen + 0.22381Thigh\\
 $$
 where the logit(p) is a special link from our linear combination of predictors to the probability of the outcome being equal to 1, and the coefficients are interpreted as changes in log-odds.
 
 
-##### 2.4.3 Visualisation and Output of the model coefficients (odds scale)
-```{r message=FALSE}
-tab_model(glm13)
-plot_model(glm13) + theme_bw(base_size = 10) + ylim(0, 0.10) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale")
-plot_model(glm13, type = "pred", terms = c("abdomen", "chest", "bicep"), show.data = TRUE) +
-  theme_bw(base_size = 10)
+##### 2.4.3 Visualising Coefficients (odds scale) and Predictions
+```{r message=FALSE, warning=FALSE}
+summary(glm12)
+#tab_model(glm0, transform = NULL)
+plot_model(glm12) + theme_bw(base_size = 10) + ylim(1, 2) + labs(x = "Overweight", y = "Odds Ratios", title = "Model Coefficients using odds scale",caption='Source: SOCR Data')
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 10) + labs(caption='Source: SOCR Data')
 ```
 
 In the Coefficient graph, the three significant variables have similar odd ratios giving the model a smaller confidence interval.
 
-From the Prediction graph, the positive slopes in the highlighted areas indicate a larger abdomen and chest circumference leads to a high probability of being overweight.
-Comparing the three individual graphs, the slight difference in the slope's y axis indicates bicep circumference correlates with odds of being overweight.
-
-##### 2.4.4 Predictions
-We correctly classified 91.2% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.8%.
+From the Prediction graph, the positive slopes indicate a larger abdomen circumference leads to a high probability of being overweight.
+Comparing the three individual graphs, the steeper slope indicates bicep circumference correlates with odds of being overweight.
+##### 2.4.4 Evaluating (in-sample) performance
+We correctly classified 92% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.0%.
 ```{r}
-data$overweight = as.numeric(data$overweight)
-glm0 = glm(overweight ~ chest + abdomen + bicep, data = data)
+glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
 data = data %>% 
   mutate(pred_prob = predict(glm0, type = "response"),
          pred_surv = round(pred_prob))
+
 mean(data$overweight == data$pred_surv)
+```
 
-# not working
-#library(caret)
-#confusion.glm = confusionMatrix(
-#  data = as.factor(data$pred_surv), 
-#  reference = as.factor(data$overweight))
+```{r}
+confusion.glm = confusionMatrix(
+  data = as.factor(data$pred_surv),
+  reference = as.factor(data$overweight))
 #confusion.glm$table
+confusion.glm
 ```
+Based on the matrix above, out of the 117 + 8 not overweight people, the model successfully predicts 117 of them. Out of the 113 + 12 overweight people, the model successfully predicts 113 of them.
 
-**The odds of being overweight for someone with an above average abdomen circumference of 120 is 1.26.**
+**The odds of being overweight for someone with an above average abdomen circumference of 110 is 5.31.**
 ```{r}
-predict_overweight = data.frame(abdomen = 130, chest = mean(data$chest), bicep = mean(data$bicep))
-predict(glm13, newdata = predict_overweight, type = "link")
+predict_overweight = data.frame(abdomen = 110, chest = mean(data$chest), thigh = mean(data$thigh))
+predict(glm12, newdata = predict_overweight, type = "link")
 ```
-**The odds of being overweight for someone with a below average abdomen circumference of 60 is -0.15.**
+**The odds of being overweight for someone with a below average abdomen circumference of 65 is -6.90.**
 ```{r}
-predict_overweight = data.frame(abdomen = 60, chest = mean(data$chest), bicep = mean(data$bicep))
-predict(glm13, newdata = predict_overweight, type = "link")
+predict_overweight = data.frame(abdomen = 65, chest = mean(data$chest), thigh = mean(data$thigh))
+predict(glm12, newdata = predict_overweight, type = "link")
 ```
-**The odds of being overweight for someone with above average circumferences for their abdomen, chest, and bicep is 1.37.**
+**The odds of being overweight for someone with slightly above average circumferences for their abdomen, chest, and bicep is 8.146941.**
 ```{r}
-predict_overweight = data.frame(abdomen = mean(data$abdomen)*1.2, chest = mean(data$chest)*1.2, bicep = mean(data$bicep)*1.2)
-predict(glm13, newdata = predict_overweight, type = "link")
+predict_overweight = data.frame(abdomen = mean(data$abdomen)*1.1, chest = mean(data$chest)*1.1, thigh = mean(data$thigh)*1.1)
+predict(glm12, newdata = predict_overweight, type = "link")
 ```
 
 
-
-##### DECISION TREE NOT WORKING delete??
-
-```{r message=FALSE}
-library(partykit)
-library(rpart)
-ov_tree = rpart(overweight ~ abdomen + chest + bicep, data = data_overweight, method = "class",control = rpart.control(cp = 0.009))
+##### 2.4.5 Decision Tree
+```{r}
+data$overweight=as.character(data$overweight)
+ov_tree = rpart(overweight ~ abdomen + chest + thigh, data = data, method = "class",control = rpart.control(cp = 0.008))
 ov_tree
 plot(as.party(ov_tree))
 ```
+
+Out of a total of 250 observations, **96%** of people with a chest circumference greater or equal to 101.55cm are overweight. Also, of the people with a chest circumference less than 101.55cm, those with an abdomen circumference greater or equal to 92.6cm are **72%** likely to be overweight. On the other hand, those with an abdomen circumference less than 92.6cm are **92%** likely to be NOT overweight.
+
 
 #### 2.5.1 Interpretation
 
