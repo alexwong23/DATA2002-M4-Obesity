@@ -1,6 +1,6 @@
 ---
 title: "DATA2002 Module 4 Report"
-subtitle: "A Research on Obesity"
+subtitle: "A reaserch on obesity"
 author: "Group 9 (460352996,480407614,480145820,470066919)"
 date: "29 October 2019"
 output:
@@ -32,6 +32,12 @@ background-position: 90% 10%
 </ol>
 ]
 ---
+
+background-image: url(assets/newintro2.png)
+background-size: 60%
+
+---
+
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 library(tidyverse)
 library(knitr)
@@ -78,16 +84,6 @@ glimpse(data)
 
 ---
 
-background-image: url(assets/newintro1.png)
-background-size: 60%
-background-position: 50% 50%
-
---
-
-background-image: url(assets/newintro2.png)
-background-size: 60%
-
----
 
 ## 2. Analysis
 .pull-left[
