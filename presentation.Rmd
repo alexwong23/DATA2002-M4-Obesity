@@ -179,6 +179,54 @@ plot(density_lm,which=1:2) + theme_bw()
 ]
 
 ---
+## 2. Relative Importance of Predictor Variables
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+par(mfrow=c(1,3))
+relweights <- function(fit,...){
+  R <- cor(fit$model)
+  nvar <- ncol(R)
+  rxx <- R[2:nvar, 2:nvar]
+  rxy <- R[2:nvar, 1]
+  svd <- eigen(rxx)
+  evec <- svd$vectors
+  ev <- svd$values
+  delta <- diag(sqrt(ev))
+  lambda <- evec %*% delta %*% t(evec)
+  lambdasq <- lambda ^ 2
+  beta <- solve(lambda) %*% rxy
+  rsquare <- colSums(beta ^ 2)
+  rawwgt <- lambdasq %*% beta ^ 2
+  import <- (rawwgt / rsquare) * 100
+  import <- as.data.frame(import)
+  row.names(import) <- names(fit$model[2:nvar])
+  names(import) <- "Weights"
+  import <- import[order(import),1, drop=FALSE]
+  dotchart(import$Weights, labels=row.names(import),
+           xlab="% of R-Square", pch=19,
+           sub=paste("Total R-Square=", round(rsquare, digits=3)),
+           ...)
+}
+```
+.pull-left-3[
+### BodyFat
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+relweights(bf_step_back, col="blue")
+```
+]
+.pull-left-3[
+### BMI
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+relweights(bmi_step_back, col="blue")
+```
+]
+.pull-left-3[
+### Density
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+relweights(density_lm, col="blue")
+```
+]
+
+---
 
 ## 2.4 Predicting if a person is Overweight
 .pull-left[

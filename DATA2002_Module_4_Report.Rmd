@@ -476,12 +476,8 @@ In the Coefficient graph, the three significant variables have similar odd ratio
 
 From the Prediction graph, the positive slopes indicate a larger abdomen circumference leads to a high probability of being overweight.
 Comparing the three individual graphs, the steeper slope indicates bicep circumference correlates with odds of being overweight.
-<<<<<<< HEAD
-##### 2.4.4 Evaluating (in-sample) performance
-=======
 
 #### 2.4.4 Evaluating (in-sample) performance
->>>>>>> eb02b408c5725340d071ce95dd26aa0caf0a559a
 We correctly classified 92% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.0%.
 ```{r}
 glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
@@ -533,10 +529,7 @@ Out of a total of 250 observations, **96%** of people with a chest circumference
 <ol>
 <li>Privacy Issues</li>
 <li>Age Range</li>
-<<<<<<< HEAD
 
-=======
->>>>>>> eb02b408c5725340d071ce95dd26aa0caf0a559a
 ```{r}
 hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
 curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
