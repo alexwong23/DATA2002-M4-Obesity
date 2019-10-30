@@ -1,6 +1,6 @@
 ---
 title: "DATA2002 Module 4 Report"
-subtitle: "A reaserch on obesity"
+subtitle: "A Research on Obesity"
 author: "Group 9 (460352996,480407614,480145820,470066919)"
 date: "29 October 2019"
 output:
@@ -143,10 +143,6 @@ $$\hat{BMI} = -10.94 + 0.161Chest$$
 $$+ 0.127Abdomen + 0.050Hip$$
 $$+ 0.150Thigh - 0.23Knee $$
 $$+ 0.115Forearm $$
-<<<<<<< HEAD
-
-=======
->>>>>>> 660988fe07f4bcfbfadb1c0cae1c9f940538fc1d
 ]
 
 --
