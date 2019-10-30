@@ -51,9 +51,14 @@ library(rpart)
 library(caret)
 ```
 
+class: middle, bottom
+background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
+background-size: 45%
+background-position: 95% 40%
+
 ## 1. Introduction to our data
 .pull-left[
-.scroll-output[
+.scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
@@ -72,11 +77,6 @@ glimpse(data)
 ```
 ]
 ]
---
-class: middle, bottom
-background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
-background-size: 45%
-background-position: 90% 20%
 
 ---
 
