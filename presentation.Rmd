@@ -282,3 +282,32 @@ ov_tree
 plot(as.party(ov_tree))
 ```
 ]
+---
+
+##Limitation
+
+--
+.pull-left-3[
+###Gender Bias
+Story:
+**Measurements of 250 men of various ages.** The percent of a man’s body that is fat is a matter of concern for health and fitness. But the %bodyfat is difficult and expensive to measure accurately. These data offer correct %bodyfat measurements along with a variety of easier to find measures. Can you build a model to predict the %bodyfat from other, more easily made, measurements?
+]
+--
+.pull-left-3[
+###Age Range
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
+curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
+```
+]
+--
+
+.pull-left-3[
+###Multicollinearity
+```{r,message=FALSE, warning=FALSE,echo=FALSE}
+ggplot(data, aes(x = abdomen, y = waist)) + 
+  geom_point() + theme_classic(base_size = 26) + 
+  labs(x = "abdomen", y = "waist") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+]
