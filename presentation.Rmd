@@ -1,6 +1,6 @@
 ---
 title: "DATA2002 Module 4 Report"
-subtitle: "A reaserch on obesity"
+subtitle: "A Research on Obesity"
 author: "Group 9 (460352996,480407614,480145820,470066919)"
 date: "29 October 2019"
 output:
