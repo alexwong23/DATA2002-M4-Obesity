@@ -127,9 +127,6 @@ $$+ 1.018Abdomen - 0.287Hip$$
 $$+ 0.26Bicep - 1.55Wrist$$
 ]
 
-<<<<<<< HEAD
-$$\hat{body-fat} = 1.52 -0.396neck - 0.128chest $$ $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
-=======
 --
 
 .pull-left-3[
@@ -146,7 +143,7 @@ $$\hat{BMI} = -10.94 + 0.161Chest$$
 $$+ 0.127Abdomen + 0.050Hip$$
 $$+ 0.150Thigh - 0.23Knee $$
 $$+ 0.115Forearm $$
->>>>>>> cad1082e3110f78e4051946853c8299ee03b7c49
+
 ]
 
 --
