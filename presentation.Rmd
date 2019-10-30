@@ -78,13 +78,14 @@ glimpse(data)
 
 ---
 
-background-image: url(assets/intro1.png)
+background-image: url(assets/newintro1.png)
 background-size: 60%
 background-position: 50% 50%
 
 --
 
-background-image: url(assets/intro2.png)
+background-image: url(assets/newintro2.png)
+background-size: 60%
 
 ---
 
