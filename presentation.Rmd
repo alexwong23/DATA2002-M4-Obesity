@@ -143,7 +143,10 @@ $$\hat{BMI} = -10.94 + 0.161Chest$$
 $$+ 0.127Abdomen + 0.050Hip$$
 $$+ 0.150Thigh - 0.23Knee $$
 $$+ 0.115Forearm $$
+<<<<<<< HEAD
 
+=======
+>>>>>>> 660988fe07f4bcfbfadb1c0cae1c9f940538fc1d
 ]
 
 --
