@@ -97,17 +97,46 @@ Based on the interactive correlation matrix, it can be seen the level of correla
 ## 2.1 Body Fat Percentage
 .pull-left[
 ### 2.1.1 Backward Selection Model
-.scroll-box-10[
+.scroll-box-30[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
-bf_lm = lm(pct_bf~.,data=data_bf)
-bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
-summ(bf_step_back)
+#bf_lm = lm(pct_bf~.,data=data_bf)
+#bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
+#summ(bf_step_back)
 ```
 ]
 ##### Fitted Model:
 $$\hat{bodyfat} = 1.52 -0.396neck - 0.128chest $$
 $$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
 ]
+
+.pull-left-3[
+### BodyFat
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+bf_lm = lm(pct_bf~.,data=data_bf)
+bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
+summ(bf_step_back)
+```
+$$\hat{bodyfat} = 1.52 -0.396neck - 0.128chest $$
+$$+1.018abdomen-0.287hip + 0.26bicep -1.55wrist$$
+]
+
+.pull-left-3[
+### BMI
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+bmi_lm = lm(bmi~.,data=data_bmi)
+bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
+summ(bmi_step_back)
+```
+]
+
+.pull-left-3[
+### Density
+```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
+density_lm = lm(formula = density ~ neck + abdomen + hip + thigh, data = data_density)
+summ(density_lm)
+```
+]
+
 
 --
 
@@ -179,7 +208,7 @@ plot(density_lm,which=1:2) + theme_bw()
 ]
 
 ---
-## 2. Relative Importance of Predictor Variables
+## 2.4 Relative Importance of Predictor Variables
 ```{r,message=FALSE, warning=FALSE,echo=FALSE, output=FALSE}
 par(mfrow=c(1,3))
 relweights <- function(fit,...){
@@ -228,9 +257,9 @@ relweights(density_lm, col="blue")
 
 ---
 
-## 2.4 Predicting if a person is Overweight
+## 2.5 Predicting if a person is Overweight
 .pull-left[
-### 2.4.1 Logistical Regression
+### 2.5.1 Logistical Regression
 .scroll-box-10[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
@@ -243,7 +272,7 @@ $$+0.27128Abdomen+0.22381Thigh$$
 ]
 --
 .pull-right[
-### 2.4.2 Visualise Predictions
+### 2.5.2 Visualise Predictions
 .scroll-box-20[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 20) + labs(caption='Source: SOCR Data')
@@ -251,9 +280,9 @@ plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.da
 ]
 ]
 ---
-## 2.4 Predicting if a person is Overweight
+## 2.5 Predicting if a person is Overweight
 .pull-left[
-### 2.4.3 Prediction Accuracy
+### 2.5.3 Prediction Accuracy
 ```{r,message=FALSE, warning=FALSE, echo=FALSE}
 glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
 data = data %>% 
@@ -277,7 +306,7 @@ ov_tree
 ]
 --
 .pull-right[
-### 2.4.4 Decision Tree
+### 2.6.4 Decision Tree
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 plot(as.party(ov_tree))
 ```
