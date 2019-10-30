@@ -286,10 +286,6 @@ $$
 Body Density = \beta_0 + \beta_1Pcf.BF + \beta_2Age + \beta_3Weight + \beta_4Height\\
 + \beta_5Neck + \beta_6Chest + \beta_7Abdomen + \beta_8Waist + \beta_9Hip + \beta_{10}Thigh\\ + \beta_{11}Knee + \beta_{12}Ankle + \beta_{13}Bicep + \beta_{14}Forearm + \beta_{15}Wrist + \epsilon
 $$
-```{r}
-#data1<-data_density[,-2]
-```
-
 
 ```{r}
 cor_matrix <- cor(data_density)
