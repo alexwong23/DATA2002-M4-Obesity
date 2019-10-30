@@ -264,7 +264,7 @@ relweights(M7, col="blue")
 
 ## 2.4 Predicting if a person is Overweight
 .pull-left[
-### 2.4.1 Logistical Regression
+### 2.4.1 Binary Logistic Regression
 .scroll-box-10[
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
