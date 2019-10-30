@@ -334,3 +334,20 @@ ggplot(data, aes(x = abdomen, y = waist)) +
 ---
 ## 4. Conclusion
 
+--
+background-image: url(https://i.pinimg.com/564x/6c/6b/15/6c6b154209c2a3cb1932f7138acef05e.jpg)
+background-size: 40%
+background-position: 50% 50%
+
+---
+### References
+
+<ol>
+<li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
+
+<li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+
+<li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+</ol>
