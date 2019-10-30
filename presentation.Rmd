@@ -19,7 +19,6 @@ output:
       navigation:
         scroll: false # disable slide transitions by scrolling
 ---
-class: middle, bottom
 background-image: url(http://thehappymiddle.com/wp-content/uploads/2018/05/bigBoned_HappyMiddleCopyrightBrianandRoseColes2018.png)
 background-size: 50%
 background-position: 90% 10%
@@ -51,7 +50,6 @@ library(rpart)
 library(caret)
 ```
 
-class: middle, bottom
 background-image: url(https://www.fitbynet.com/wp-content/uploads/2018/07/BMI-Calculator-for-men.jpg)
 background-size: 45%
 background-position: 95% 40%
@@ -80,7 +78,6 @@ glimpse(data)
 
 ---
 
-class: middle, bottom
 background-image: url(assets/intro1.png)
 background-size: 60%
 background-position: 50% 50%
@@ -171,7 +168,7 @@ $$ + 0.0011314Hip - 0.0006094Thigh$$
 .pull-left-3[
 ### BodyFat
 .scroll-box-30[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
 par(mfrow=c(1,2))
 plot(bf_step_back,which=1:2) + theme_bw()
 ```
@@ -183,7 +180,7 @@ plot(bf_step_back,which=1:2) + theme_bw()
 .pull-left-3[
 ### BMI
 .scroll-box-30[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
 par(mfrow=c(1,2))
 plot(bmi_step_back,which=1:2) + theme_bw()
 ```
@@ -195,7 +192,7 @@ plot(bmi_step_back,which=1:2) + theme_bw()
 .pull-left-3[
 ### Density
 .scroll-box-30[
-```{r,message=FALSE, warning=FALSE,echo=FALSE}
+```{r,message=FALSE, warning=FALSE,echo=FALSE, results = 'hide'}
 par(mfrow=c(1,2))
 plot(density_step_back,which=1:2) + theme_bw()
 ```
@@ -316,27 +313,30 @@ plot(as.party(ov_tree))
 
 ]
 ---
-
 ## 3. Limitations
 
 --
+background-image: url(http://d3thpuk46eyjbu.cloudfront.net/uploads/production/10575/1549935738/original/C8qr_qZUIAATGnd.jpg)
+background-size: 30%
+background-position: 5% 60%
 .pull-left-3[
-###Gender Bias
-Story:
-**Measurements of 250 men of various ages.** The percent of a man’s body that is fat is a matter of concern for health and fitness. But the %bodyfat is difficult and expensive to measure accurately. These data offer correct %bodyfat measurements along with a variety of easier to find measures. Can you build a model to predict the %bodyfat from other, more easily made, measurements?
+- ###Gender Bias
 ]
+
 --
+
 .pull-left-3[
-###Age Range
+- ###Age Range
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
 curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
 ```
 ]
+
 --
 
 .pull-left-3[
-###Multicollinearity
+- ###Multicollinearity
 ```{r,message=FALSE, warning=FALSE,echo=FALSE}
 ggplot(data, aes(x = abdomen, y = waist)) + 
   geom_point() + theme_classic(base_size = 26) + 
@@ -347,3 +347,21 @@ ggplot(data, aes(x = abdomen, y = waist)) +
 
 ---
 ## 4. Conclusion
+
+--
+background-image: url(https://i.pinimg.com/564x/6c/6b/15/6c6b154209c2a3cb1932f7138acef05e.jpg)
+background-size: 40%
+background-position: 50% 50%
+
+---
+### References
+
+<ol>
+<li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
+
+<li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+
+<li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+</ol>
