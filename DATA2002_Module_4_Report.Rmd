@@ -410,9 +410,9 @@ autoplot(M7,which=1:2)+theme_bw()
 ***
 #### 2.4 Which variables can best predict whether a person is overweight?
 
-Since the variable 'Overweight' is dichotomous (binary), we perform a logistical regression to interpret the relationship between overweight and other significant variables.
+Since the variable 'Overweight' is dichotomous (binary), we perform a logistic regression to interpret the relationship between overweight and other significant variables.
 
-##### 2.4.1 Checking for Significance in a Logistic Regression
+##### 2.4.1 Checking for Significance in a Binary Logistic Regression
 ```{r,warning=FALSE}
 data_overweight = data[-c(4:5,17)]
 data_overweight$overweight = as.numeric(data_overweight$overweight)
