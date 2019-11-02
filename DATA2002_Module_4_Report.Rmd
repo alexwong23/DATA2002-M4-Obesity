@@ -565,17 +565,13 @@ Out of a total of 250 observations, **96%** of people with a chest circumference
 <li>Gender Bias</li>
 <li>Privacy Issues</li>
 <li>Age Range</li>
-<<<<<<< HEAD
-<li></li>
-=======
-
 ```{r}
 hist(data$age, freq=FALSE, col="aliceblue", xlab="Age", main="Age Range Histogram")
 curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
 ```
 <li>Multicollilinearity</li>
->>>>>>> cad1082e3110f78e4051946853c8299ee03b7c49
 </ol>
+
 ## 4. Conclusion
 
 ## 5. References

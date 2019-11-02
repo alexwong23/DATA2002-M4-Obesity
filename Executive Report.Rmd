@@ -1,37 +1,15 @@
 ---
 title: Predicting Obesity Using DASL Dataset
 
-# Use letters for affiliations
+
 author:
-  - name: 460352996
-  - name: 470066919
-  - name: 480145820
-  - name: 480407614
+  - name: 460352996 470066919 480145820 480407614
     
-    
-# Optional: line of arbitrary text with additional information.
-# Could be used, for example, to mention the bibliographic info in a post-print.
-# If not specified, defaults to "This version was compiled on \today"
-#date_subtitle: Published in *Journal of Statistical Software*, 2018
-
-# For footer text  TODO(fold into template, allow free form two-authors)
-lead_author_surname: Author and Author
+lead_author_surname: 460352996 470066919 480145820 480407614
 
 
-# Abstract
 abstract: |
-  Excess weight, especially obesity, has become an epidemic in the 21st century. This study aims to investigate an alternative method to determine "overweight" individuals oppose to body fat percentage. Two alternative methods are considered - BMI and body density. The results showed that BMI can be explained the best using simple body measurement and the measurement on abdomen is the most important predictor in estimating all three methods. A simpler predictive model for obesity has been developed using measurements on chest, abdomen and bicep. Limitations and implications are discussed.
-
-
-# Optional: Acknowledgements
-acknowledgements: |
-  This template package builds upon, and extends, the work of the excellent
-  [rticles](https://cran.r-project.org/package=rticles) package, and both packages rely on the
-  [PNAS LaTeX](http://www.pnas.org/site/authors/latex.xhtml) macros. Both these sources are
-  gratefully acknowledged as this work would not have been possible without them.  Our extensions
-  are under the same respective licensing term
-  ([GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html) and
-  [LPPL (>= 1.3)](https://www.latex-project.org/lppl/)).
+  Excess weight, especially obesity, has become an epidemic in the 21st century. This study aims to investigate an alternative method to determine "overweight" individuals oppose to body fat percentage. Two alternative indicators are considered - BMI and body density. The results showed that BMI can be explained the best using simple body measurement and the measurement on abdomen is the most important predictor in estimating all three methods. A simpler predictive model for obesity has been developed using measurements on chest, abdomen and bicep. Limitations and implications are discussed.
 
 # Optional: One or more keywords
 keywords:
@@ -46,44 +24,23 @@ papersize: a4
 # Font size of the document, values of 9pt (default), 10pt, 11pt and 12pt
 fontsize: 9pt
 
-# Optional: Force one-column layout, default is two-column
-#one_column: true
-
-# Optional: Enables lineno mode, but only if one_column mode is also true
-#lineno: true
-
-# Optional: Enable one-sided layout, default is two-sided
-#one_sided: true
-
-# Optional: Enable section numbering, default is unnumbered
-#numbersections: true
-
-# Optional: Specify the depth of section number, default is 5
-#secnumdepth: 5
-
-# Optional: Skip inserting final break between acknowledgements, default is false
 skip_final_break: true
 
 # Optional: Bibliography 
 bibliography: pinp
 
-# Optional: Enable a 'Draft' watermark on the document
-#watermark: true
-
-# Customize footer, eg by referencing the vignette
 footer_contents: "A Research on Obesity"
 
 # Produce a pinp document
 output: pinp::pinp
 
-# Required: Vignette metadata for inclusion in a package.
 vignette: >
   %\VignetteIndexEntry{YourPackage-vignetteentry}
   %\VignetteKeywords{YourPackage, r, anotherkeyword}
   %\VignettePackage{YourPackage}
   %\VignetteEngine{knitr::rmarkdown}
 ---
-```{r load_packages, include=TRUE, message=FALSE, warning=FALSE}
+```{r load_packages, include=TRUE, echo=FALSE,message=FALSE, warning=FALSE}
 library(tidyverse)
 library(knitr)
 library(janitor)
@@ -99,7 +56,7 @@ library(rpart)
 library(caret)
 ```
 
-```{r import_data, message=FALSE, warning=FALSE}
+```{r import_data, message=FALSE, warning=FALSE, echo=FALSE}
 data = read.delim("bodyfat.txt") %>% janitor::clean_names()
 data = data %>%
   mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
@@ -115,137 +72,139 @@ data_overweight = data[-c(4:5,17)]
 ```
 
 ## Introduction 
-Excess weight is the new epidemic of the 21st century and has resulted in many significant health and economic consequences for the global population (Stein and Colditz, 2004). In Australia, the obesity epidemic has spread drastically as 2 in 3 adults are classified as overweight or obese (Australian Institute of Health and Welfare, 2019). Researches has shown that this epidemic is more common in males than females and hence, BYU Human Performance Research Center has collected data from 250 men of various age and obtained estimates of the percentage of body fat through underwater weighing and various body circumference measurements (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is difficult to calculate in real life, the value for body fat percentage was derived from body density using the Siri’s 1956 equation.
+Excess weight is the new epidemic of the 21st century and has resulted in many significant health and economic consequences for the global population (Stein and Colditz, 2004). In Australia, the obesity epidemic has spread drastically as 1 in 3 adults are classified as overweight or obese (Australian Institute of Health and Welfare, 2019). Researches have shown that this epidemic is more common in males than females and hence, BYU Human Performance Research Center has collected data from 250 men of various age and obtained estimates of the percentage of body fat through underwater weighing and various body circumference measurements (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is difficult to calculate in real life, the value for body fat percentage was derived from body density using the Siri’s 1956 equation.
 
 
-## Sampling Method
+### 1.1 Data cleaning and processing
+The DASL dataset contain 16 variables including body density, age, body fat percentage and body measurements. The dataset has already been cleaned and for the purpose of this analysis, an additional variable - BMI, has been added where $$ BMI = \frac{Weight (lbs)*703}{Height(in)^2} $$
+
+### 1.2 Sampling Method
 Few details were provided with regards to the sampling method. However, from looking at the dataset, there is a gender bias as the epidemic question is one related to both genders, yet only male were involved in the sample. This suggests that any analysis based on this dataset cannot be applied to the whole population but only the male population.
 
-## Analysis Approach
+## Analysis
+The analysis approach can be broken down into three steps.
 
-Step 1: determine how much variation in body fat percentage can be explained by simply body measurements and the number of measurements that is significant in building an accurate prediction model to examine the ease of calculation.
+### Step 1: 
+Using multiple regression, firstly determine the number of body measurements that is significant in building an accurate prediction model for the three obesity indicators (Body Fat Percentage, BMI and Body Density) individually and how much variation can be explained using only body measurements to examine the ease of calculation.
 
-Step 2: conduct similar analysis  on BMI and Body Density where the end result will be compared together to determine which method can be explained the best using simple body measurements.
+### Step 2: 
+Compare the end results to determine the best indicator given that body measurements are the only available variables. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
 
-Step 3: a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0) using  BMI as the guiding criteria. A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obesed.
+### Step 3: 
+Using BMI as the obesity indicator, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obesed.
 
+## Multiple Regression 
 
+### Analysis
 
-## References 
+A correlation matrix is firstly drawn to show the general interactive correlation between variables. 
 
-Here we differ from PNAS and suggest natbib. References will appear in
-author-year form. Use `\citet{}`, `\citep{}`, etc as usual.
-
-We default to the `jss.bst` style. To switch to a different bibliography
-style, please use `biblio-style: style` in the YAML header.
-
-
-## Inline R Code 
-
-The PNAS sample included a fixed PNG image here, but this document prefers
-to show the results and embedding of _R_ code. 
-
-```{r figex, fig.width=3, fig.height=3, cache=TRUE, echo=FALSE, fig.cap=""}
-library(ggplot2)
-data$overweight = as.character(data$overweight)
-ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: DASL Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
-data$overweight = as.numeric(data$overweight)
+```{r,echo=F,fig.height=3}
+cor_matrix <- cor(data_density)
+pheatmap(cor_matrix, display_numbers = F,na.rm=T) 
 ```
 
-Here we use a standard knitr bloc with explicit options for
+Notably, waist, chest, abdomen are showing highly correlated relationships, and this may be due to the fact that they are from a similar body area. Hence, body measurements that are from similar areas are classified and linked together using the above graph.
 
-- figure width and height (`fig.width`, `fig.height`), both set to three inches;
-- whether the code is shown (`echo=TRUE`); and
-- the caption (`fig.cap`) as shown above.
+All three obesity indicator follow a similar procedure for multiple regression analysis. 
 
+Backward stepwise model was used for body fat and BMI where a full model was selected at the start. The least informative variables were dropped using AIC until only the most relevant variables remain and a final fitted model is achieved. A forward variable selection method was used for body density and a null model was selected at the beginning with subsquent addition of the most statistically signicant variable. The final fitted model is formed when no further addition is required.
 
-## Digital Figures 
+For the analysis of BMI, a transformation using log was required. However, as BMI is measured in unit increase, the interpretation of percentage changeds is unreasonable. Hence, the non-transformed model was used as the final fitted model.
 
-Markdown, Pandoc and LaTeX support `.eps` and `.pdf` files.
+Assumptions for normality and homoskedasticity were checked via residuals plots and QQ plot. Then the predictor variable plots were drawn for illustrating the relative importance of the remaining variables. 
 
-Figures and Tables should be labelled and referenced in the standard way
-using the `\label{}` and `\ref{}` commands.
+### Results
+The final fitted models for the three obesity indicators were:
+$$ 
+\begin{aligned}
+\hat{Body-Fat} &= 1.52 -0.3965neck - 0.128chest + 1.01805abdomen\\
+&-0.28758hip + 0.26bicep -1.55084wrist\\
+\hat{BMI} &= -10.94 +0.161Chest + 0.127Abdomen + 0.050Hip\\
+&+ 0.150Thigh - 0.23Knee + 0.115Forearm\\
+\hat{Body Density} &= 1.1104052 + 0.0019085 Neck- 0.0022064Abdomen\\
+&+ 0.0011314 Hip - 0.0006094 Thigh\\
+\end{aligned}
+$$
 
-The R examples above show how to insert a column-wide
-figure. To insert a figure wider than one column, please use the
-`\begin{figure*}...\end{figure*}` environment. 
+All three QQ plots had shown a straight lines and this satisfies the normality assumption. However, the residual plots showed a slight variation for all three indicators, but given that the residual units were quite small, it is acceptable for the current analysis. 
 
-One (roundabout) way of doing this is to _not_ actually plot a figure, but to
-save it in a file as the following segment shows:
+Overall, abdomen is relatively the most important measurement in predicting all three obesity indicator and this result was expected as it corresponds to the previous correlation matrix analysis. 
 
-```{r densityPlot, echo=TRUE}
-library(ggplot2)
-p <- ggplot(data = midwest,
-            mapping = aes(x = area,
-                          fill = state,
-                          color = state)) +
-    geom_density(alpha = 0.3)
-## save to file
-suppressMessages(ggsave("densities.pdf", p))
+BMI was identified as the best obesity indicator given only body measurements as 90.2% of its variation can be explained using solely body measurements compared to 73.5% for Body Fat Percentage and 70.4% for Body Density.
+
+## Logistic Regression
+
+### Analysis
+A binary logistic regression was used to calculate the probability of a person being overweight where overweight is indicated by a BMI greater or equal to 25. 
+
+Similar to the multiple regression analysis, a backward stepwise selection method is also utilised to determine a final classification model.
+
+Using the model, the probability of an individual being obesed is then derived using a confusion matrix and its performance as a predictive model is evaluated at last.
+
+### Results
+The final classification model is
+$$
+\begin{aligned}
+logit(p)=log(\frac{p}{1-p})=-75.89380+0.37854Chest\\ +0.27128Abdomen+0.22381Thigh
+\end{aligned}
+$$
+
+The results of this model is visualised using the graph below through the sigmoid function. The predicted values to probabilities are mapped between 0 and 1. For predictions of 0.5 and above, these are classifed as people who are overweight.Whereas predictions of below 0.5 are classified as people who are not overweight.
+
+```{r,echo=F,message=F,warning=F,fig.height=3}
+glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 10) + labs(caption='Source: SOCR Data')
 ```
 
-This file is then included via standard LaTeX commands.
-
-\begin{figure*}
-  \begin{center}
-    \includegraphics[width=0.66\textwidth, height=3.5in]{densities} 
-  \end{center}
-  \caption{Wide ggplot2 figure}\label{fig}
-\end{figure*}
-
-
-## Typeset Code (But Do Not Run It) 
-
-We can also just show code.
-
-```r
-xx <- faithful[,"eruptions"]
-fit <- density(xx)
-plot(fit)
+To evaluate performace, a confusion matrix is created performance of our classification model. 
+```{r,echo=FALSE,warning=FALSE}
+glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
+data = data %>% 
+  mutate(pred_prob = predict(glm0, type = "response"),
+         pred_surv = round(pred_prob))
+confusion.glm = confusionMatrix(
+  data = as.factor(data$pred_surv),
+  reference = as.factor(data$overweight))
+confusion.glm$table
 ```
+The accurate and inaccurate predictions are the diagonal and non-diagonal values respectively. For this model, there are 117 + 113 accurate predictions, and 12 + 8 are inaccurate predictions. 
 
-This simply used a pandoc bloc started and ended by three backticks,
-with `r` as the language choice.  Similarly, _many_ other languages
-can be typeset directly simply by relying on pandoc.
+In fact, it has a sensitivity of 93.6% to correctly identify those who are overweight, which is calculated as the number of correct positive predictions (117) divided by the total number of positives (117 + 8). 
 
+The model also has a specificity of 90.4%, which is the ability to correctly identify those who are not overweight. This is calculated as the number of correct negative predictions (113) divided by the total number of negatives (113 + 12).
 
-## Single column equations 
+Together, these summarises to an accuracy of 92% and this new simplified model is, therefore, a good predictive model.
 
-Authors may use 1- or 2-column equations in their article, according to
-their preference.
+## Limitations
+### 4.1 Gender bias
+The data is taken from 250 males without any record of female.  Therefore, the result of this analysis can only be applied to the male population rather than the entire population in general. 
 
-To allow an equation to span both columns, options are to use the
-`\begin{figure*}...\end{figure*}` environment mentioned above for
-figures. The `\begin{widetext}...\end{widetext}` environment as shown
-in equation \ref{eqn:example} below is deprecated, but \LaTeX commands
-`\onecolumn` and `\twocolumn` work fine.
+### 4.2 Age range
+Majority of the samples are gathered from male between the age of 40-50. This creates potential bias in the sample and will compromise the accuracy of prediction on the younger or older males.
 
-Please note that this option may run into problems with floats and
-footnotes, as mentioned in the [cuted package
-documentation](http://texdoc.net/pkg/cuted). In the case of problems
-with footnotes, it may be possible to correct the situation using
-commands `\footnotemark` and `\footnotetext`.
+### 4.3 Multicollinearity
+Several variables from the dataset are highly dependent with the most significant correlation between waist and abdomen. Through plotting the points into a QQ-Plot, it is evident that all points are closely sitting on the line. Hence, during model selection, waist was dropped to prevent multicollinearity.
 
-\begin{equation}
-  \begin{aligned}
-(x+y)^3&=(x+y)(x+y)^2\\
-       &=(x+y)(x^2+2xy+y^2) \\
-       &=x^3+3x^2y+3xy^3+x^3. 
-       \label{eqn:example} 
-  \end{aligned}
-\end{equation}
+## Conclusion
+Through multiple regression and variable selection, three fitted model were determined for the three obesity indicators individually with solely body measurements. Using $R^2$, BMI was identified as the best indicator as it has the highest proportion of variance that can be explained using only body measurements. 
 
+Abdomen was the most important body measurement for determining obesity because for all three indicators, it ranked the highest in terms of relative importance in prediction.
 
-<!-- pandoc writes all tables using longtable, which fails in 2-column mode
+By separating the dataset with the binary variable for over-weight individuals, a simplified prediction model is built with 92% accuracy. The simplified model contains three body measurements - chest, abdomen and thigh, and should be relatively simpler to measure.
 
-  Species                    CBS     CV     G3
-  ----------------------- ------ ------ ------
-  1\. Acetaldehyde           0.0    0.0    0.0
-  2\. Vinyl alcohol          9.1    9.6   13.5
-  3\. Hydroxyethylidene     50.8   51.2   54.0
+## Reference List
 
-  : Comparison of the fitted potential energy surfaces and ab initio
-  benchmark electronic energy calculations
+### 1.
+Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> 
 
--->
+### 2.
+DASL. (n.d.). Bodyfat. DASL. Retrieved from <https://dasl.datadescription.com/datafile/bodyfat>
+
+### 3.
+Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48.
+
+### 4.
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525.
+
 
