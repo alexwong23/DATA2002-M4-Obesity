@@ -76,7 +76,7 @@ population (Stein and Colditz, 2004). In Australia, the obesity epidemic
 has spread drastically as 1 in 3 adults are classified as overweight or
 obese (Australian Institute of Health and Welfare, 2019). Researches
 have shown that this epidemic is more common in males than females and
-hence, BYU Human Performance Research Center has collected data from 250
+hence, BYU Human Performance Research Centre has collected data from 250
 men of various age and obtained estimates of the percentage of body fat
 through underwater weighing and various body circumference measurements
 (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is
@@ -99,7 +99,7 @@ BMI, has been added where
 
 Few details were provided with regards to the sampling method. However,
 from looking at the dataset, there is a gender bias as the epidemic
-question is one related to both genders, yet only male were involved in
+question is one related to both genders, yet only males were involved in
 the sample. This suggests that any analysis based on this dataset cannot
 be applied to the whole population but only the male population.
 
@@ -130,7 +130,7 @@ measurement is relatively the most important.
 
 Using BMI as the obesity indicator, a binary indicator will be added to
 differentiate the sample into overweight individuals (1) and
-non-overweight individuals (0).A logistic regression is run on the
+non-overweight individuals (0). A logistic regression is run on the
 binary indicator with significant variables that we have identified
 throughout research in order to build a simpler model to determine the
 odds of an individual being obese.
@@ -148,12 +148,12 @@ correlation between variables.
 
 \(\textbf{Figure 1:}\textit{ Correlation Matrix}\)
 
-Notably, waist, chest, abdomen are highly correlated, and this may be
+Notably, waist, chest and abdomen are highly correlated, and this may be
 due to the fact that they are from a similar body area. Hence, body
 measurements that are from similar areas are classified and linked
 together using the above graph.
 
-All three obesity indicator follow a similar procedure for multiple
+All three obesity indicators follow a similar procedure for multiple
 regression analysis.
 
 Backward stepwise model was used for Body Fat and BMI where a full model
@@ -161,7 +161,7 @@ was selected at the start. The least informative variables were dropped
 using AIC until only the most relevant variables remain and a final
 fitted model is achieved. A forward variable selection method was used
 for body density and a null model was selected at the beginning with
-subsquent addition of the most statistically signicant variable. The
+subsequent addition of the most statistically significant variable. The
 final fitted model is formed when no further addition is required.
 
 For the analysis of BMI, a transformation using log was required.
@@ -182,19 +182,18 @@ The final fitted models for the three obesity indicators were: \[
 &+ 1.01805Abdomen -0.28758Hip + 0.26Bicep -1.55084Wrist\\
 &(2) \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen\\
 &+ 0.050Hip + 0.150Thigh - 0.23Knee + 0.115Forearm\\
-&(3)\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
+&(3) \hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
 &- 0.0022064Abdomen + 0.0011314 Hip - 0.0006094 Thigh\\
 \end{aligned}
 \]
 
-All three QQ plots had shown a straight lines and this satisfies the
-normality assumption. However, the residual plots showed a slight
-variation for all three indicators, but given that the residual units
-were quite small, it is acceptable for the current analysis (Appendix
-A).
+All three QQ plots show straight lines and this satisfies the normality
+assumption. However, the residual plots showed a slight variation for
+all three indicators, but given that the residual units were quite
+small, it is acceptable for the current analysis (Appendix A).
 
 Overall, abdomen is relatively the most important measurement in
-predicting all three obesity indicator and this result was expected as
+predicting all three obesity indicators and this result was expected as
 it corresponds to the previous correlation matrix analysis (Appendix B).
 
 BMI was identified as the best obesity indicator given only body
@@ -227,13 +226,15 @@ logit(p)=log(\frac{p}{1-p})=-75.89380+0.37854Chest\\ +0.27128Abdomen+0.22381Thig
 \end{aligned}
 \]
 
-The results of this model is visualised by Figure 2 through the sigmoid
+The results of this model are visualised by Figure 2 through the sigmoid
 function. The predicted values to probabilities are mapped between 0 and
-1. For predictions of 0.5 and above, these are classifed as people who
+1. For predictions of 0.5 and above, these are classified as people who
 are overweight. Whereas predictions of below 0.5 are classified as
 people who are non-overweight.
 
 \begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-2-1} \end{center}
+
+\(\textbf{Figure 2:}\textit{Predicted values of Overweight}\)
 
 A confusion matrix is created to derive the performance of our
 classification model.
@@ -362,8 +363,8 @@ Regression.~Medium. Retrieved from
 \hypertarget{appendixes}{%
 \subsection{Appendixes}\label{appendixes}}
 
-\hypertarget{appendix-a--}{%
-\subsubsection{Appendix A -}\label{appendix-a--}}
+\hypertarget{appendix-a}{%
+\subsubsection{Appendix A}\label{appendix-a}}
 
 Multiple Regression: Assumption Checking in the order of Body Fat
 Percentage, BMI and Body Density
@@ -374,8 +375,8 @@ Percentage, BMI and Body Density
 
 \begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-3} \end{center}
 
-\hypertarget{appendix-b--}{%
-\subsubsection{Appendix B -}\label{appendix-b--}}
+\hypertarget{appendix-b}{%
+\subsubsection{Appendix B}\label{appendix-b}}
 
 Multiple Regression: Relative Importance of Predictors in the order of
 Body Fat Percentage, BMI and Body Density
