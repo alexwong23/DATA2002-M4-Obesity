@@ -196,40 +196,40 @@ Avinash, N. (2018). Understanding Logistic Regression in Python. DataCamp. Retr
 Nagesh S. C. (n.d.). Real world implementation of Logistic Regression. Medium. Retrieved from <https://towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125>
 
 ## Appendices
-### Appendix A - Multiple Regression
+### Appendix A - Multiple Regression: Relative Importance of Predictors
+\begin{ShadedResult}
+\begin{verbatim}
+#            Weights
+#  wrist    4.038431
+#  bicep    7.746760
+#  neck     8.238378
+#  hip     16.313788
+#  chest   21.795458
+#  abdomen 41.867184
+\end{verbatim}
+\end{ShadedResult}
+\begin{ShadedResult}
+\begin{verbatim}
+#            Weights
+#  forearm  9.021850
+#  knee     9.080285
+#  thigh   15.075099
+#  hip     17.245099
+#  abdomen 24.705834
+#  chest   24.871833
+\end{verbatim}
+\end{ShadedResult}
 
-```r
-bf_lm = lm(pct_bf~.,data=data_bf)
-bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
-summary(bf_step_back)
-```
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-1} \end{center}
 
 \begin{ShadedResult}
 \begin{verbatim}
-#  
-#  Call:
-#  lm(formula = pct_bf ~ neck + chest + abdomen + hip + bicep + 
-#      wrist, data = data_bf)
-#  
-#  Residuals:
-#     Min     1Q Median     3Q    Max 
-#  -9.668 -2.889 -0.361  3.210 11.148 
-#  
-#  Coefficients:
-#              Estimate Std. Error t value Pr(>|t|)    
-#  (Intercept)  1.52703    6.63727   0.230 0.818232    
-#  neck        -0.39650    0.22234  -1.783 0.075783 .  
-#  chest       -0.12810    0.08992  -1.425 0.155562    
-#  abdomen      1.01805    0.07431  13.700  < 2e-16 ***
-#  hip         -0.28758    0.09232  -3.115 0.002060 ** 
-#  bicep        0.26094    0.15160   1.721 0.086469 .  
-#  wrist       -1.55084    0.45510  -3.408 0.000767 ***
-#  ---
-#  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#  
-#  Residual standard error: 4.32 on 243 degrees of freedom
-#  Multiple R-squared:  0.7353,	Adjusted R-squared:  0.7287 
-#  F-statistic: 112.5 on 6 and 243 DF,  p-value: < 2.2e-16
+#           Weights
+#  neck    11.06366
+#  thigh   13.82063
+#  hip     19.73563
+#  abdomen 55.38008
 \end{verbatim}
 \end{ShadedResult}
 
