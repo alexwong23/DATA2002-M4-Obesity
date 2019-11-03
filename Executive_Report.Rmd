@@ -93,18 +93,20 @@ Few details were provided with regards to the sampling method. However, from loo
 The analysis approach can be broken down into three steps.
 
 ### Step 1
-Using multiple regression, firstly determine the number of body measurements that is significant in building an accurate prediction model for the obesity indicators (Body Fat Percentage, BMI and Body Density) individually and determine the level of explained variation through $R^2$.
+Using multiple regression, firstly determine the number of body measurements that is significant in building an accurate prediction model for the three obesity indicators (Body Fat Percentage, BMI and Body Density) individually and how much variation can be explained using only body measurements to examine the ease of calculation.
 
 ### Step 2
-Compare the end results to determine the best indicator given only body measurements. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
+Compare the end results to determine the best indicator given that body measurements are the only available variables. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
 
 ### Step 3
-Using BMI as the obesity indicator, a binary indicator is added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
+Using BMI as the obesity indicator, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
 
 ## Multiple Regression 
+
 ### Analysis
 
 A correlation matrix is firstly drawn to show the general interactive correlation between variables. 
+
 
 ```{r,echo=F,fig.height=2.5}
 cor_matrix <- cor(data_density)
@@ -125,6 +127,7 @@ Assumptions for normality and homoskedasticity were checked via residuals plots 
 ### Results
 The final fitted models for the three obesity indicators were:
 $$ 
+\begin{equation}
 \begin{aligned}
 &\hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
 &+ 1.01805Abdomen -0.28758Hip + 0.26Bicep -1.55084Wrist\\
@@ -133,6 +136,7 @@ $$
 &\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
 &- 0.0022064Abdomen + 0.0011314 Hip - 0.0006094 Thigh\\
 \end{aligned}
+\end{equation}
 $$
 
 All three QQ plots had shown a straight lines and this satisfies the normality assumption. However, the residual plots showed a slight variation for all three indicators, but given that the residual units were quite small, it is acceptable for the current analysis. 
@@ -192,7 +196,7 @@ A decision tree on the variables abdomen and chest is represented by Appendix C.
 data$overweight = as.character(data$overweight)
 ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count',caption='Source: SOCR Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
 ```
-$\textbf{Figure 3:Obesity across different age groups}$ 
+\textbf{\textit{Figure 3:}Obesity across different age groups} 
 
 ### 4.1 Gender bias
 The data is taken from 250 males without any record of females. Therefore, the result of this analysis can only be applied to the male population rather than the entire population in general.

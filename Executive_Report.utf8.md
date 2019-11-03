@@ -44,41 +44,9 @@ vignette: >
   %\VignettePackage{YourPackage}
   %\VignetteEngine{knitr::rmarkdown}
 ---
-```{r load_packages, include=TRUE, echo=FALSE,message=FALSE, warning=FALSE}
-library(tidyverse)
-library(knitr)
-library(janitor)
-library("readxl")
-library(ggfortify)
-library(GGally)
-library(qtlcharts)
-library(leaps)
-library(sjPlot)
-library(pheatmap)
-library(partykit)
-library(rpart)
-library(caret)
-library(pinp)
-library(tinytex)
-#install.packages("pinp")
-#install.packages("tinytex")
-#tinytex::install_tinytex()  # install TinyTeX
-```
 
-```{r import_data, message=FALSE, warning=FALSE, echo=FALSE}
-data = read.delim("bodyfat.txt") %>% janitor::clean_names()
-data = data %>%
-  mutate(bmi = (data$weight/(data$height ^ 2)) * 703,
-         overweight = case_when(
-          bmi >= 25 ~ 1,
-          bmi < 25 ~ 0))
-data$overweight = as.numeric(data$overweight)
-#colnames(data)
-data_bmi = data[-c(1:2,4:5,18)]
-data_bf = data[-c(1,3:5,17:18)]
-data_density = data[-c(2:5,17:18)]
-data_overweight = data[-c(4:5,17)]
-```
+
+
 ## Introduction 
 Excess weight is the new epidemic of the 21st century and has resulted in many significant health and economic consequences for the global population (Stein and Colditz, 2004). In Australia, the obesity epidemic has spread drastically as 1 in 3 adults are classified as overweight or obese (Australian Institute of Health and Welfare, 2019). Researches have shown that this epidemic is more common in males than females and hence, BYU Human Performance Research Center has collected data from 250 men of various age and obtained estimates of the percentage of body fat through underwater weighing and various body circumference measurements (Rahman and Harding, 2013; DASL, n.d.). As body fat percentage is difficult to calculate in real life, the value for body fat percentage was derived from body density using the Siri’s 1956 equation (DASL, n.d.).
 
@@ -93,23 +61,23 @@ Few details were provided with regards to the sampling method. However, from loo
 The analysis approach can be broken down into three steps.
 
 ### Step 1
-Using multiple regression, firstly determine the number of body measurements that is significant in building an accurate prediction model for the obesity indicators (Body Fat Percentage, BMI and Body Density) individually and determine the level of explained variation through $R^2$.
+Using multiple regression, firstly determine the number of body measurements that is significant in building an accurate prediction model for the three obesity indicators (Body Fat Percentage, BMI and Body Density) individually and how much variation can be explained using only body measurements to examine the ease of calculation.
 
 ### Step 2
-Compare the end results to determine the best indicator given only body measurements. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
+Compare the end results to determine the best indicator given that body measurements are the only available variables. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
 
 ### Step 3
-Using BMI as the obesity indicator, a binary indicator is added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
+Using BMI as the obesity indicator, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
 
 ## Multiple Regression 
+
 ### Analysis
 
 A correlation matrix is firstly drawn to show the general interactive correlation between variables. 
 
-```{r,echo=F,fig.height=2.5}
-cor_matrix <- cor(data_density)
-pheatmap(cor_matrix, display_numbers = F,na.rm=T) 
-```
+
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-1-1} \end{center}
 Figure 1: Correlation Matrix
 
 Notably, waist, chest, abdomen are showing highly correlated relationships, and this may be due to the fact that they are from a similar body area. Hence, body measurements that are from similar areas are classified and linked together using the above graph.
@@ -125,6 +93,7 @@ Assumptions for normality and homoskedasticity were checked via residuals plots 
 ### Results
 The final fitted models for the three obesity indicators were:
 $$ 
+\begin{equation}
 \begin{aligned}
 &\hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
 &+ 1.01805Abdomen -0.28758Hip + 0.26Bicep -1.55084Wrist\\
@@ -133,6 +102,7 @@ $$
 &\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
 &- 0.0022064Abdomen + 0.0011314 Hip - 0.0006094 Thigh\\
 \end{aligned}
+\end{equation}
 $$
 
 All three QQ plots had shown a straight lines and this satisfies the normality assumption. However, the residual plots showed a slight variation for all three indicators, but given that the residual units were quite small, it is acceptable for the current analysis. 
@@ -158,24 +128,20 @@ $$
 
 The results of this model is visualised by Figure 2 through the sigmoid function. The predicted values to probabilities are mapped between 0 and 1. For predictions of 0.5 and above, these are classifed as people who are overweight. Whereas predictions of below 0.5 are classified as people who are non-overweight.
 
-```{r,echo=F,message=F,warning=F,fig.height=2}
-glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
-plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 9) + labs(caption='Source: SOCR Data')
-```
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-2-1} \end{center}
 Figure 2: Predicted value of overweight
 
 A confusion matrix is created to derive the performance of our classification model.
 
-```{r,echo=FALSE,warning=FALSE}
-glm0 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data)
-data = data %>% 
-  mutate(pred_prob = predict(glm0, type = "response"),
-         pred_surv = round(pred_prob))
-confusion.glm = confusionMatrix(
-  data = as.factor(data$pred_surv),
-  reference = as.factor(data$overweight))
-confusion.glm$table
-```
+\begin{ShadedResult}
+\begin{verbatim}
+#            Reference
+#  Prediction   0   1
+#           0 117  12
+#           1   8 113
+\end{verbatim}
+\end{ShadedResult}
 The accurate and inaccurate predictions are the diagonal and non-diagonal values respectively. For this model, there are 117 + 113 accurate predictions, and 12 + 8 are inaccurate predictions. 
 
 In fact, it has a sensitivity, ability to correctly identify those who are overweight, of 93.6%. This is calculated as the number of correct positive predictions (117) divided by the total number of positives (117 + 8). 
@@ -188,11 +154,9 @@ A decision tree on the variables abdomen and chest is represented by Appendix C.
 
 ## Limitations
 
-```{r message=FALSE, warning=FALSE,fig.height=2,echo=F}
-data$overweight = as.character(data$overweight)
-ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count',caption='Source: SOCR Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
-```
-$\textbf{Figure 3:Obesity across different age groups}$ 
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-4-1} \end{center}
+\textbf{\textit{Figure 3:}Obesity across different age groups} 
 
 ### 4.1 Gender bias
 The data is taken from 250 males without any record of females. Therefore, the result of this analysis can only be applied to the male population rather than the entire population in general.
@@ -233,15 +197,42 @@ Nagesh S. C. (n.d.). Real world implementation of Logistic Regression. Medium. 
 
 ## Appendices
 ### Appendix A - Multiple Regression
-```{r}
+
+```r
 bf_lm = lm(pct_bf~.,data=data_bf)
 bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
 summary(bf_step_back)
 ```
 
+\begin{ShadedResult}
+\begin{verbatim}
+#  
+#  Call:
+#  lm(formula = pct_bf ~ neck + chest + abdomen + hip + bicep + 
+#      wrist, data = data_bf)
+#  
+#  Residuals:
+#     Min     1Q Median     3Q    Max 
+#  -9.668 -2.889 -0.361  3.210 11.148 
+#  
+#  Coefficients:
+#              Estimate Std. Error t value Pr(>|t|)    
+#  (Intercept)  1.52703    6.63727   0.230 0.818232    
+#  neck        -0.39650    0.22234  -1.783 0.075783 .  
+#  chest       -0.12810    0.08992  -1.425 0.155562    
+#  abdomen      1.01805    0.07431  13.700  < 2e-16 ***
+#  hip         -0.28758    0.09232  -3.115 0.002060 ** 
+#  bicep        0.26094    0.15160   1.721 0.086469 .  
+#  wrist       -1.55084    0.45510  -3.408 0.000767 ***
+#  ---
+#  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#  
+#  Residual standard error: 4.32 on 243 degrees of freedom
+#  Multiple R-squared:  0.7353,	Adjusted R-squared:  0.7287 
+#  F-statistic: 112.5 on 6 and 243 DF,  p-value: < 2.2e-16
+\end{verbatim}
+\end{ShadedResult}
 
-```{r,echo=F,message=F,warning=F,fig.height=3}
-data$overweight=as.character(data$overweight)
-ov_tree = rpart(overweight ~ abdomen + chest, data = data, method = "class",control = rpart.control(cp = 0.008))
-plot(as.party(ov_tree), main="Appendix C: Decision Tree on Abdomen and Chest variables")
-```
+
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-6-1} \end{center}
