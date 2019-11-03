@@ -130,7 +130,7 @@ measurement is relatively the most important.
 
 Using BMI as the obesity indicator, a binary indicator will be added to
 differentiate the sample into overweight individuals (1) and
-non-overweight individuals (0). A logistic regression is run on the
+non-overweight individuals (0).A logistic regression is run on the
 binary indicator with significant variables that we have identified
 throughout research in order to build a simpler model to determine the
 odds of an individual being obese.
@@ -146,17 +146,17 @@ correlation between variables.
 
 \begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-1-1} \end{center}
 
-Figure 1: Correlation Matrix
+\(\textbf{Figure 1:}\textit{ Correlation Matrix}\)
 
-Notably, waist, chest, abdomen are showing highly correlated
-relationships, and this may be due to the fact that they are from a
-similar body area. Hence, body measurements that are from similar areas
-are classified and linked together using the above graph.
+Notably, waist, chest, abdomen are highly correlated, and this may be
+due to the fact that they are from a similar body area. Hence, body
+measurements that are from similar areas are classified and linked
+together using the above graph.
 
 All three obesity indicator follow a similar procedure for multiple
 regression analysis.
 
-Backward stepwise model was used for body fat and BMI where a full model
+Backward stepwise model was used for Body Fat and BMI where a full model
 was selected at the start. The least informative variables were dropped
 using AIC until only the most relevant variables remain and a final
 fitted model is achieved. A forward variable selection method was used
@@ -170,34 +170,32 @@ percentage changed is unreasonable. Hence, the non-transformed model was
 used as the final fitted model.
 
 Assumptions for normality and homoskedasticity were checked via
-residuals plots and QQ plot. Then the predictor variable plots were
-drawn for illustrating the relative importance of the remaining
-variables.
+residuals plots and QQ plot and the relative importance of the remaining
+variables is illustrated using the predictor plots.
 
 \hypertarget{results}{%
 \subsubsection{Results}\label{results}}
 
 The final fitted models for the three obesity indicators were: \[ 
-\begin{equation}
 \begin{aligned}
-&\hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
+&(1) \hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
 &+ 1.01805Abdomen -0.28758Hip + 0.26Bicep -1.55084Wrist\\
-&\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen\\
+&(2) \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen\\
 &+ 0.050Hip + 0.150Thigh - 0.23Knee + 0.115Forearm\\
-&\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
+&(3)\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
 &- 0.0022064Abdomen + 0.0011314 Hip - 0.0006094 Thigh\\
 \end{aligned}
-\end{equation}
 \]
 
 All three QQ plots had shown a straight lines and this satisfies the
 normality assumption. However, the residual plots showed a slight
 variation for all three indicators, but given that the residual units
-were quite small, it is acceptable for the current analysis.
+were quite small, it is acceptable for the current analysis (Appendix
+A).
 
 Overall, abdomen is relatively the most important measurement in
 predicting all three obesity indicator and this result was expected as
-it corresponds to the previous correlation matrix analysis.
+it corresponds to the previous correlation matrix analysis (Appendix B).
 
 BMI was identified as the best obesity indicator given only body
 measurements as 90.2\% of its variation can be explained using solely
@@ -213,8 +211,8 @@ for Body Density.
 A binary logistic regression was used to calculate the probability of a
 person being overweight where overweight is indicated by a BMI greater
 or equal to 25. Similar to the multiple regression analysis, a backward
-stepwise selection method is also utilised to determine a final
-classification model.
+stepwise selection method is used to determine a final classification
+model.
 
 Using the model, the probability of an individual being obese is then
 derived using a confusion matrix where its performance as a predictive
@@ -237,8 +235,6 @@ people who are non-overweight.
 
 \begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-2-1} \end{center}
 
-Figure 2: Predicted value of overweight
-
 A confusion matrix is created to derive the performance of our
 classification model.
 
@@ -255,15 +251,9 @@ The accurate and inaccurate predictions are the diagonal and
 non-diagonal values respectively. For this model, there are 117 + 113
 accurate predictions, and 12 + 8 are inaccurate predictions.
 
-In fact, it has a sensitivity, ability to correctly identify those who
-are overweight, of 93.6\%. This is calculated as the number of correct
-positive predictions (117) divided by the total number of positives (117
-+ 8).
-
-The model also has a specificity of 90.4\%, which is the ability to
-correctly identify those who are non-overweight. This is calculated as
-the number of correct negative predictions (113) divided by the total
-number of negatives (113 + 12).
+The model has a sensitivity, ability to correctly identify those who are
+overweight, of 93.6\%; and a specificity of 90.4\%, which is the ability
+to correctly identify those who are non-overweight.
 
 Along with an accuracy of 92\%, we summarise that this new simplified
 model is, therefore, a good predictive model.
@@ -281,14 +271,15 @@ less than 92.6cm are 92\% likely to be non-overweight.
 
 \begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-4-1} \end{center}
 
-\textbf{\textit{Figure 3:}Obesity across different age groups}
+\(\textbf{Figure 3:}\textit{Obesity across different age groups}\)
 
 \hypertarget{gender-bias}{%
 \subsubsection{4.1 Gender bias}\label{gender-bias}}
 
 The data is taken from 250 males without any record of females.
 Therefore, the result of this analysis can only be applied to the male
-population rather than the entire population in general.
+population rather than the entire population, which will limit the use
+of the analysis.
 
 \hypertarget{age-range}{%
 \subsubsection{4.2 Age range}\label{age-range}}
@@ -301,10 +292,9 @@ accuracy on younger or older males.
 \subsubsection{4.3 Multicollinearity}\label{multicollinearity}}
 
 Several variables from the dataset are highly dependent, with the most
-significant correlation between waist and abdomen. Through plotting the
-points into a QQ-Plot, it is evident that all points are closely sitting
-on the line. Hence, during model selection, waist was dropped to prevent
-multicollinearity.
+significant correlation between waist and abdomen. In a QQ-Plot, all
+points are closely sitting on the line. Hence, during model selection,
+waist was dropped to prevent multicollinearity.
 
 \hypertarget{conclusion}{%
 \subsection{Conclusion}\label{conclusion}}
@@ -369,12 +359,26 @@ Nagesh S. C. (n.d.). Real world implementation of Logistic
 Regression.~Medium. Retrieved from
 \url{https://towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125}
 
-\hypertarget{appendices}{%
-\subsection{Appendices}\label{appendices}}
+\hypertarget{appendixes}{%
+\subsection{Appendixes}\label{appendixes}}
 
-\hypertarget{appendix-a---multiple-regression-relative-importance-of-predictors}{%
-\subsubsection{Appendix A - Multiple Regression: Relative Importance of
-Predictors}\label{appendix-a---multiple-regression-relative-importance-of-predictors}}
+\hypertarget{appendix-a--}{%
+\subsubsection{Appendix A -}\label{appendix-a--}}
+
+Multiple Regression: Assumption Checking in the order of Body Fat
+Percentage, BMI and Body Density
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-1} \end{center}
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-2} \end{center}
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-3} \end{center}
+
+\hypertarget{appendix-b--}{%
+\subsubsection{Appendix B -}\label{appendix-b--}}
+
+Multiple Regression: Relative Importance of Predictors in the order of
+Body Fat Percentage, BMI and Body Density
 
 \begin{ShadedResult}
 \begin{verbatim}
@@ -398,9 +402,6 @@ Predictors}\label{appendix-a---multiple-regression-relative-importance-of-predic
 #  chest   24.871833
 \end{verbatim}
 \end{ShadedResult}
-
-\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-5-1} \end{center}
-
 \begin{ShadedResult}
 \begin{verbatim}
 #           Weights
@@ -411,7 +412,12 @@ Predictors}\label{appendix-a---multiple-regression-relative-importance-of-predic
 \end{verbatim}
 \end{ShadedResult}
 
-\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-6-1} \end{center}
+\hypertarget{appendix-c--}{%
+\subsubsection{Appendix C -}\label{appendix-c--}}
+
+Decision Tree on Abdomen and Chest variables
+
+\begin{center}\includegraphics{Executive_Report_files/figure-latex/unnamed-chunk-7-1} \end{center}
 
 %\showmatmethods
 

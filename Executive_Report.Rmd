@@ -44,6 +44,7 @@ vignette: >
   %\VignettePackage{YourPackage}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 ```{r load_packages, include=TRUE, echo=FALSE,message=FALSE, warning=FALSE}
 library(tidyverse)
 library(knitr)
@@ -99,7 +100,7 @@ Using multiple regression, firstly determine the number of body measurements tha
 Compare the end results to determine the best indicator given that body measurements are the only available variables. In each sample, a relative importance test will also be run to determine which body measurement is relatively the most important. 
 
 ### Step 3
-Using BMI as the obesity indicator, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0). A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
+Using BMI as the obesity indicator, a binary indicator will be added to differentiate the sample into overweight individuals (1) and non-overweight individuals (0).A logistic regression is run on the binary indicator with significant variables that we have identified throughout research in order to build a simpler model to determine the odds of an individual being obese.
 
 ## Multiple Regression 
 
@@ -108,47 +109,45 @@ Using BMI as the obesity indicator, a binary indicator will be added to differen
 A correlation matrix is firstly drawn to show the general interactive correlation between variables. 
 
 
-```{r,echo=F,fig.height=2.5}
+```{r,echo=F,fig.height=3}
 cor_matrix <- cor(data_density)
 pheatmap(cor_matrix, display_numbers = F,na.rm=T) 
 ```
-Figure 1: Correlation Matrix
+$\textbf{Figure 1:}\textit{ Correlation Matrix}$
 
-Notably, waist, chest, abdomen are showing highly correlated relationships, and this may be due to the fact that they are from a similar body area. Hence, body measurements that are from similar areas are classified and linked together using the above graph.
+Notably, waist, chest, abdomen are highly correlated, and this may be due to the fact that they are from a similar body area. Hence, body measurements that are from similar areas are classified and linked together using the above graph.
 
 All three obesity indicator follow a similar procedure for multiple regression analysis. 
 
-Backward stepwise model was used for body fat and BMI where a full model was selected at the start. The least informative variables were dropped using AIC until only the most relevant variables remain and a final fitted model is achieved. A forward variable selection method was used for body density and a null model was selected at the beginning with subsquent addition of the most statistically signicant variable. The final fitted model is formed when no further addition is required.
+Backward stepwise model was used for Body Fat and BMI where a full model was selected at the start. The least informative variables were dropped using AIC until only the most relevant variables remain and a final fitted model is achieved. A forward variable selection method was used for body density and a null model was selected at the beginning with subsquent addition of the most statistically signicant variable. The final fitted model is formed when no further addition is required.
 
 For the analysis of BMI, a transformation using log was required. However, as BMI is measured in unit increase, the interpretation of percentage changed is unreasonable. Hence, the non-transformed model was used as the final fitted model.
 
-Assumptions for normality and homoskedasticity were checked via residuals plots and QQ plot. Then the predictor variable plots were drawn for illustrating the relative importance of the remaining variables. 
+Assumptions for normality and homoskedasticity were checked via residuals plots and QQ plot and the relative importance of the remaining variables is illustrated using the predictor plots.
 
 ### Results
 The final fitted models for the three obesity indicators were:
 $$ 
-\begin{equation}
 \begin{aligned}
-&\hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
+&(1) \hat{Body Fat} = 1.52 -0.3965Neck - 0.128Chest\\
 &+ 1.01805Abdomen -0.28758Hip + 0.26Bicep -1.55084Wrist\\
-&\hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen\\
+&(2) \hat{BMI} = -10.94 +0.161Chest + 0.127Abdomen\\
 &+ 0.050Hip + 0.150Thigh - 0.23Knee + 0.115Forearm\\
-&\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
+&(3)\hat{Body Density} = 1.1104052 + 0.0019085 Neck\\
 &- 0.0022064Abdomen + 0.0011314 Hip - 0.0006094 Thigh\\
 \end{aligned}
-\end{equation}
 $$
 
-All three QQ plots had shown a straight lines and this satisfies the normality assumption. However, the residual plots showed a slight variation for all three indicators, but given that the residual units were quite small, it is acceptable for the current analysis. 
+All three QQ plots had shown a straight lines and this satisfies the normality assumption. However, the residual plots showed a slight variation for all three indicators, but given that the residual units were quite small, it is acceptable for the current analysis (Appendix A). 
 
-Overall, abdomen is relatively the most important measurement in predicting all three obesity indicator and this result was expected as it corresponds to the previous correlation matrix analysis. 
+Overall, abdomen is relatively the most important measurement in predicting all three obesity indicator and this result was expected as it corresponds to the previous correlation matrix analysis (Appendix B). 
 
 BMI was identified as the best obesity indicator given only body measurements as 90.2% of its variation can be explained using solely body measurements compared to 73.5% for Body Fat Percentage and 70.4% for Body Density.
 
 ## Logistic Regression
 
 ### Analysis
-A binary logistic regression was used to calculate the probability of a person being overweight where overweight is indicated by a BMI greater or equal to 25. Similar to the multiple regression analysis, a backward stepwise selection method is also utilised to determine a final classification model.
+A binary logistic regression was used to calculate the probability of a person being overweight where overweight is indicated by a BMI greater or equal to 25. Similar to the multiple regression analysis, a backward stepwise selection method is used to determine a final classification model.
 
 Using the model, the probability of an individual being obese is then derived using a confusion matrix where its performance as a predictive model is evaluated.
 
@@ -164,9 +163,8 @@ The results of this model is visualised by Figure 2 through the sigmoid function
 
 ```{r,echo=F,message=F,warning=F,fig.height=2}
 glm12 = glm(overweight ~ chest + abdomen + thigh, family = binomial, data = data_overweight)
-plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 9) + labs(caption='Source: SOCR Data')
+plot_model(glm12, type = "pred", terms = c("abdomen", "chest", "thigh"), show.data = TRUE) + theme_bw(base_size = 9) + labs(caption='Source: SOCR Data',title = "Figure 2: Predicted values of Overweight")
 ```
-Figure 2: Predicted value of overweight
 
 A confusion matrix is created to derive the performance of our classification model.
 
@@ -182,9 +180,7 @@ confusion.glm$table
 ```
 The accurate and inaccurate predictions are the diagonal and non-diagonal values respectively. For this model, there are 117 + 113 accurate predictions, and 12 + 8 are inaccurate predictions. 
 
-In fact, it has a sensitivity, ability to correctly identify those who are overweight, of 93.6%. This is calculated as the number of correct positive predictions (117) divided by the total number of positives (117 + 8). 
-
-The model also has a specificity of 90.4%, which is the ability to correctly identify those who are non-overweight. This is calculated as the number of correct negative predictions (113) divided by the total number of negatives (113 + 12).
+The model has a sensitivity, ability to correctly identify those who are overweight, of 93.6%; and a specificity of 90.4%, which is the ability to correctly identify those who are non-overweight. 
 
 Along with an accuracy of 92%, we summarise that this new simplified model is, therefore, a good predictive model.
 
@@ -196,16 +192,16 @@ A decision tree on the variables abdomen and chest is represented by Appendix C.
 data$overweight = as.character(data$overweight)
 ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count',caption='Source: SOCR Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
 ```
-\textbf{\textit{Figure 3:}Obesity across different age groups} 
+$\textbf{Figure 3:}\textit{Obesity across different age groups}$
 
 ### 4.1 Gender bias
-The data is taken from 250 males without any record of females. Therefore, the result of this analysis can only be applied to the male population rather than the entire population in general.
+The data is taken from 250 males without any record of females. Therefore, the result of this analysis can only be applied to the male population rather than the entire population, which will limit the use of the analysis.
 
 ### 4.2 Age range
 Majority of the participants are males between the age of 40-50. This is a potential bias in the sample that can compromise the prediction accuracy on younger or older males.
 
 ### 4.3 Multicollinearity
-Several variables from the dataset are highly dependent, with the most significant correlation between waist and abdomen. Through plotting the points into a QQ-Plot, it is evident that all points are closely sitting on the line. Hence, during model selection, waist was dropped to prevent multicollinearity.
+Several variables from the dataset are highly dependent, with the most significant correlation between waist and abdomen. In a QQ-Plot, all points are closely sitting on the line. Hence, during model selection, waist was dropped to prevent multicollinearity.
 
 ## Conclusion
 Through multiple regression and variable selection, a fitted model with solely body measurements was determined for each of the three obesity indicators. Using $R^2$, BMI was identified as the best indicator as it has the highest proportion of variance that can be explained using only body measurements. 
@@ -235,9 +231,27 @@ Avinash, N. (2018). Understanding Logistic Regression in Python. DataCamp. Retr
 ### 6.
 Nagesh S. C. (n.d.). Real world implementation of Logistic Regression. Medium. Retrieved from <https://towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125>
 
-## Appendices
-### Appendix A - Multiple Regression: Relative Importance of Predictors
-```{r,,echo=F,warning=F,message=F,output=F}
+## Appendixes
+
+### Appendix A - 
+Multiple Regression: Assumption Checking in the order of Body Fat Percentage, BMI and Body Density
+
+```{r,fig.height=2,echo=F}
+bf_lm = lm(pct_bf~.,data=data_bf)
+bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
+bmi_lm = lm(bmi~.,data=data_bmi)
+bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
+M7<- lm(formula = density ~ neck + abdomen + hip + thigh , 
+    data = data_density)
+par(mfrow=c(3,1))
+autoplot(bf_step_back,which=1:2)+theme_bw()
+autoplot(bmi_step_back,which=1:2)+theme_bw()
+autoplot(M7,which=1:2)+theme_bw()
+```
+
+### Appendix B - 
+Multiple Regression: Relative Importance of Predictors in the order of Body Fat Percentage, BMI and Body Density
+```{r,echo=F,warning=F,message=F}
 rel <- function(fit,...){
   R <- cor(fit$model)
   nvar <- ncol(R)
@@ -257,29 +271,20 @@ rel <- function(fit,...){
   row.names(import) <- names(fit$model[2:nvar])
   names(import) <- "Weights"
   import <- import[order(import),1, drop=FALSE]
-  dotchart(import$Weights, labels=row.names(import),
-           xlab="% of R-Square", pch=19,
-           main="Relative Importance of Predictor Variables",
-           sub=paste("Total R-Square=", round(rsquare, digits=3)),
-           ...)
   return(import)
 }
 
-par(mfrow=c(3,1))
-bf_lm = lm(pct_bf~.,data=data_bf)
-bf_step_back = step(bf_lm, direction = "backward",trace = FALSE)
 rel(bf_step_back, col="blue")
-bmi_lm = lm(bmi~.,data=data_bmi)
-bmi_step_back = step(bmi_lm, direction = "backward",trace = FALSE)
 rel(bmi_step_back, col="blue")
-M7<- lm(formula = density ~ neck + abdomen + hip + thigh , 
-    data = data_density)
 rel(M7, col="blue")
 ```
 
 
+
+### Appendix C - 
+Decision Tree on Abdomen and Chest variables
 ```{r,echo=F,message=F,warning=F,fig.height=3}
 data$overweight=as.character(data$overweight)
 ov_tree = rpart(overweight ~ abdomen + chest, data = data, method = "class",control = rpart.control(cp = 0.008))
-plot(as.party(ov_tree), main="Appendix C: Decision Tree on Abdomen and Chest variables")
+plot(as.party(ov_tree))
 ```
