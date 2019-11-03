@@ -57,7 +57,7 @@ glimpse(data)
 
 #### 1.3.1 Obesity and Age
 ```{r message=FALSE, warning=FALSE}
-ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: SOCR Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Not Overweight", "Overweight"))
+ggplot(data, aes(x=age,fill=overweight)) + geom_bar() +scale_fill_brewer(palette = "Paired") +labs(x='Age',y='Count', title = 'Severity of Obesity Across Different Age Groups',caption='Source: SOCR Data') +theme(plot.title = element_text(hjust = 0.5, face = 'bold'))+theme(axis.text.x = element_text(angle = 50, hjust = 1))+scale_fill_discrete(name = "Overweight", labels = c("Non-Overweight", "Overweight"))
 ```
 
 From looking at the graph, it can be observed that most of the sample comes from the age group between 40-60 and the number of people who appear to be overweight seems to be distributed evenly across the population.
@@ -89,8 +89,6 @@ Due to the increasing consumptions of fast food and the increasing convenience o
 
 ### 2.1 Body Fat Percentage
 ##### 2.1.1 Data Visualisation
-
-=======
 
 ```{r}
 qtlcharts::iplotCorr(data_bf)
@@ -408,11 +406,12 @@ autoplot(M7,which=1:2)+theme_bw()
 ```
 
 ***
-#### 2.4 Which variables can best predict whether a person is overweight?
+### 2.4 Predict Overweight
+#### Which variables can best predict whether a person is overweight?
 
 Since the variable 'Overweight' is dichotomous (binary), we perform a logistic regression to interpret the relationship between overweight and other significant variables.
 
-##### 2.4.1 Checking for Significance in a Binary Logistic Regression
+#### 2.4.1 Checking for Significance in a Binary Logistic Regression
 ```{r,warning=FALSE}
 data_overweight = data[-c(4:5,17)]
 data_overweight$overweight = as.numeric(data_overweight$overweight)
@@ -472,7 +471,7 @@ summary(glm12)
 ```
 Before we start making predictions with the model, we drop the variables which are not a significant predictor for being overweight. The fitted model is shown below.
 
-##### 2.4.2 Fitted Model (log odds scale)
+#### 2.4.2 Fitted Model (log odds scale)
 $$
 logit(p) = log(\frac{p}{1-p})  = -75.89380 + 0.37854Chest\\
 + 0.27128Abdomen + 0.22381Thigh\\
@@ -480,7 +479,7 @@ $$
 where the logit(p) is a special link from our linear combination of predictors to the probability of the outcome being equal to 1, and the coefficients are interpreted as changes in log-odds.
 
 
-##### 2.4.3 Visualising Coefficients (odds scale) and Predictions
+#### 2.4.3 Visualising Coefficients (odds scale) and Predictions
 ```{r message=FALSE, warning=FALSE}
 summary(glm12)
 #tab_model(glm0, transform = NULL)
@@ -493,7 +492,7 @@ In the Coefficient graph, the three significant variables have similar odd ratio
 From the Prediction graph, the positive slopes indicate a larger abdomen circumference leads to a high probability of being overweight.
 Comparing the three individual graphs, the steeper slope indicates bicep circumference correlates with odds of being overweight.
 
-##### 2.4.4 Evaluating (in-sample) performance
+#### 2.4.4 Evaluating (in-sample) performance
 We correctly classified 91.2% of the observations, hence our resubstitution error rate, proportion of data predicted incorrectly using the fitted model, is 8.8%.
 ```{r}
 glm0 = glm(overweight ~ chest + abdomen + bicep, family = binomial, data = data)
@@ -511,7 +510,7 @@ confusion.glm = confusionMatrix(
 confusion.glm$table
 confusion.glm
 ```
-Based on the matrix above, out of the 117 + 8 not overweight people, the model successfully predicts 117 of them. Out of the 113 + 12 overweight people, the model successfully predicts 113 of them.
+Based on the matrix above, out of the 117 + 8 non-overweight people, the model successfully predicts 117 of them. Out of the 113 + 12 overweight people, the model successfully predicts 113 of them.
 
 **The odds of being overweight for someone with an above average abdomen circumference of 110 is 5.31.**
 ```{r}
@@ -546,18 +545,15 @@ predict(glm12, newdata = predict_overweight, type = "link")
 ```
 
 
-##### 2.4.5 Decision Tree
+#### 2.4.5 Decision Tree
 ```{r}
 data$overweight=as.character(data$overweight)
 ov_tree = rpart(overweight ~ abdomen + chest + thigh, data = data, method = "class",control = rpart.control(cp = 0.008))
 ov_tree
-plot(as.party(ov_tree))
+plot(as.party(ov_tree), main="Decision Tree on Abdomen and Chest variables")
 ```
 
-Out of a total of 250 observations, **96%** of people with a chest circumference greater or equal to 101.55cm are overweight. Also, of the people with a chest circumference less than 101.55cm, those with an abdomen circumference greater or equal to 92.6cm are **72%** likely to be overweight. On the other hand, those with an abdomen circumference less than 92.6cm are **92%** likely to be NOT overweight.
-
-
-#### 2.5.1 Interpretation
+Out of a total of 250 observations, **96%** of people with a chest circumference greater or equal to 101.55cm are overweight. Also, of the people with a chest circumference less than 101.55cm, those with an abdomen circumference greater or equal to 92.6cm are **72%** likely to be overweight. On the other hand, those with an abdomen circumference less than 92.6cm are **92%** likely to be non-overweight.
 
 
 ## 3. Limitations
@@ -578,10 +574,14 @@ curve(dnorm(x, mean=mean(data$age), sd=sd(data$age)), add=TRUE, col="red") #line
 <ol>
 <li>  Australian Institute of Health and Welfare (AIHW). (2019). Overweight & obesity. Australian Government. Retrieved from <https://www.aihw.gov.au/reports-data/behaviours-risk-factors/overweight-obesity/overview> </li>
 
-</li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
+<li> DASL. (n.d.). Bodyfat. DASL. Retrieved from < https://dasl.datadescription.com/datafile/bodyfat> </li>
 
-</li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
+<li> Rahman, A., & Harding, A. (2013). Prevalence of overweight and obesity epidemic in Australia: some causes and consequences. JP Journal of Biostatistics, 10(1), 31-48. </li>
 
-</li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+<li> Stein, C. J., & Colditz, G. A. (2004). The epidemic of obesity. The Journal of Clinical Endocrinology & Metabolism, 89(6), 2522-2525. </li>
+
+<li> Avinash, N. (2018). Understanding Logistic Regression in Python. DataCamp. Retrieved from <https://www.datacamp.com/community/tutorials/understanding-logistic-regression-python> </li>
+
+<li> Nagesh S. C. (n.d.). Real world implementation of Logistic Regression. Medium. Retrieved from <https://towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125> </li>
 </ol> 
 

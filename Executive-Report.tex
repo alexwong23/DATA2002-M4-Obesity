@@ -226,13 +226,11 @@ logit(p)=log(\frac{p}{1-p})=-75.89380+0.37854Chest\\ +0.27128Abdomen+0.22381Thig
 \end{aligned}
 \]
 
-The results of this model is visualised using the graph below through
-the sigmoid function. The predicted values to probabilities are mapped
+The results of this model is visualised by Figure 3.5 through the
+sigmoid function. The predicted values to probabilities are mapped
 between 0 and 1. For predictions of 0.5 and above, these are classifed
 as people who are overweight. Whereas predictions of below 0.5 are
-classified as people who are not overweight.
-
-\begin{center}\includegraphics{Executive-Report_files/figure-latex/unnamed-chunk-2-1} \end{center}
+classified as people who are non-overweight.
 
 A confusion matrix is created to derive the performance of our
 classification model.
@@ -256,12 +254,20 @@ positive predictions (117) divided by the total number of positives (117
 + 8).
 
 The model also has a specificity of 90.4\%, which is the ability to
-correctly identify those who are not overweight. This is calculated as
+correctly identify those who are non-overweight. This is calculated as
 the number of correct negative predictions (113) divided by the total
 number of negatives (113 + 12).
 
 Along with an accuracy of 92\%, we summarise that this new simplified
 model is, therefore, a good predictive model.
+
+A decision tree on the variables abdomen and chest is represented by
+Figure 3.6. Out of a total of 250 observations, 96\% of people with a
+chest circumference greater or equal to 101.55cm are overweight. Also,
+of the people with a chest circumference less than 101.55cm, those with
+an abdomen circumference greater or equal to 92.6cm are 72\% likely to
+be overweight. On the other hand, those with an abdomen circumference
+less than 92.6cm are 92\% likely to be non-overweight.
 
 \hypertarget{limitations}{%
 \subsection{Limitations}\label{limitations}}
@@ -335,6 +341,27 @@ Biostatistics,~10(1), 31-48.
 
 Stein, C. J., \& Colditz, G. A. (2004). The epidemic of obesity.~The
 Journal of Clinical Endocrinology \& Metabolism,~89(6), 2522-2525.
+
+\hypertarget{section-4}{%
+\subsubsection{5.}\label{section-4}}
+
+Avinash, N. (2018). Understanding Logistic Regression in
+Python.~DataCamp. Retrieved from
+\url{https://www.datacamp.com/community/tutorials/understanding-logistic-regression-python}
+
+\hypertarget{section-5}{%
+\subsubsection{6.}\label{section-5}}
+
+Nagesh S. C. (n.d.). Real world implementation of Logistic
+Regression.~Medium. Retrieved from
+\url{https://towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125}
+
+\hypertarget{appendix}{%
+\subsection{Appendix}\label{appendix}}
+
+\begin{center}\includegraphics{Executive-Report_files/figure-latex/unnamed-chunk-3-1} \end{center}
+
+\begin{center}\includegraphics{Executive-Report_files/figure-latex/unnamed-chunk-4-1} \end{center}
 
 %\showmatmethods
 
