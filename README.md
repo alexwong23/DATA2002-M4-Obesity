@@ -7,11 +7,11 @@ Excess weight, especially obesity, has become an epidemic in the 21st century. T
 
 Files
 -------------------
-1. DATA2002_Module_4_Report.html\n
-Contains main R code and our study findings
+1. DATA2002_Module_4_Report.html
+  - Contains main R code and our study findings
 
-2. presentation.html\n
-27 page slides created using xaringan
+2. presentation.html
+  - 27 page slides created using xaringan
 
-3. Executive_Report.html\n
-A professional 3-page report in the form of a pinp document
+3. Executive_Report.html
+  - A professional 3-page report in the form of a pinp document
