@@ -39,4 +39,4 @@ Files
    - 27 page slides created using xaringan
 
 3. Executive_Report.html
-   - A professional 3-page report in the form of a pinp document
+   - A professional 3-page report produced by a pinp document
