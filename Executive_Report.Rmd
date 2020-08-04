@@ -6,7 +6,7 @@ author:
   - name: 460352996 470066919 480145820 480407614
 
 address:
-  - address: GitHub code repository is [here](https://github.com/alexwong23/DATA2002-M4-Obesity.git)
+  - address: GitHub code repository is [here](https://github.com/alexwong23/DATA2002-M4-Obesity.git) 
 
 
 lead_author_surname: 460352996 470066919 480145820 480407614
